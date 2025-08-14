@@ -1,10 +1,11 @@
 "use client";
 import Link from 'next/link';
-import { ChefHat, ShoppingCart, User } from 'lucide-react';
+import { ShoppingCart, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/use-cart';
 import { CartSheet } from '@/components/cart/cart-sheet';
 import { useState } from 'react';
+import Image from 'next/image';
 
 export function Header() {
   const { items } = useCart();
@@ -14,7 +15,14 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
-          <ChefHat className="h-6 w-6 text-primary" />
+          <Image
+            src="https://placehold.co/40x40.png"
+            alt="Let's Cook Curry Logo"
+            width={40}
+            height={40}
+            className="rounded-full"
+            data-ai-hint="logo curry"
+          />
           <span className="font-bold font-headline inline-block">Let's Cook Curry</span>
         </Link>
         <nav className="flex-1 items-center space-x-6 text-sm font-medium hidden sm:flex">
