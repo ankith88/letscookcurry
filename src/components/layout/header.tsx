@@ -13,7 +13,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center pl-4">
+      <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <Image
             src="https://raw.githubusercontent.com/ankith88/letscookcurry/master/assets/images/lcc_logo.png"
@@ -28,6 +28,9 @@ export function Header() {
         <nav className="flex-1 items-center space-x-6 text-sm font-medium hidden sm:flex">
           <Link href="/" className="text-foreground/60 transition-colors hover:text-foreground/80">
             Home
+          </Link>
+          <Link href="/about" className="text-foreground/60 transition-colors hover:text-foreground/80">
+            About Us
           </Link>
           <Link href="/profile" className="text-foreground/60 transition-colors hover:text-foreground/80">
             Profile
