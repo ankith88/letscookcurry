@@ -1,8 +1,8 @@
 import { RecipeGrid } from '@/components/recipes/recipe-grid';
 import { getWeeklyRecipes } from '@/lib/recipes';
 
-export default function Home() {
-  const recipes = getWeeklyRecipes();
+export default async function Home() {
+  const recipes = await getWeeklyRecipes();
 
   return (
     <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">

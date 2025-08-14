@@ -1,4 +1,6 @@
 import type { Recipe } from '@/lib/types';
+import { db } from '@/lib/firebase';
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 
 // In a real application, this data would be fetched from a CMS or database.
 // The selection of recipes would change every Monday.
@@ -122,12 +124,23 @@ export const allRecipes: Recipe[] = [
   },
 ];
 
-export function getWeeklyRecipes() {
-  // In a real app, logic would exist here to select different recipes each week.
-  // For this demo, we'll just return the first 6.
-  return allRecipes.slice(0, 6);
+export async function getWeeklyRecipes(): Promise<Recipe[]> {
+  const recipesCol = collection(db, 'recipes');
+  const recipeSnapshot = await getDocs(recipesCol);
+  const recipeList = recipeSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Recipe));
+  
+  // For this demo, we'll just return all recipes.
+  // In a real app, you might have a 'weekly' flag on recipes.
+  return recipeList;
 }
 
-export function getRecipeById(id: string) {
-  return allRecipes.find((recipe) => recipe.id === id);
+export async function getRecipeById(id: string): Promise<Recipe | null> {
+    const recipeRef = doc(db, 'recipes', id);
+    const recipeSnap = await getDoc(recipeRef);
+
+    if (recipeSnap.exists()) {
+        return { ...recipeSnap.data(), id: recipeSnap.id } as Recipe;
+    } else {
+        return null;
+    }
 }

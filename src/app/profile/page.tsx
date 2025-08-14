@@ -1,17 +1,27 @@
 "use client"
 
 import { useCart } from "@/hooks/use-cart";
-import { orderHistory } from "@/lib/orders";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { History, PlusCircle, UserCircle } from "lucide-react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import type { Order } from "@/lib/types";
+
 
 export default function ProfilePage() {
     const { addItem } = useCart();
     const { toast } = useToast();
+    const [orderHistory, setOrderHistory] = useState<Order[]>([]);
+
+    // In a real app, this would fetch from a database.
+    // We'll keep it client-side for now.
+    useEffect(() => {
+        // Simulating a fetch
+        setOrderHistory([]);
+    }, []);
 
     const handleReorder = (orderItems: any[]) => {
         orderItems.forEach(item => addItem(item));
@@ -48,7 +58,7 @@ export default function ProfilePage() {
                         <CardDescription>Review your past orders and quickly reorder your favorites.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-8">
-                        {orderHistory.map((order) => (
+                        {orderHistory.length > 0 ? orderHistory.map((order) => (
                             <div key={order.id}>
                                 <div className="flex flex-col md:flex-row justify-between md:items-center mb-4">
                                     <div>
@@ -85,7 +95,9 @@ export default function ProfilePage() {
                                 </div>
                                 <Separator className="mt-8"/>
                             </div>
-                        ))}
+                        )) : (
+                            <p className="text-muted-foreground">You have no past orders.</p>
+                        )}
                     </CardContent>
                 </Card>
             </div>

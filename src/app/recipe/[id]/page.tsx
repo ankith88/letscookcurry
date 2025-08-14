@@ -10,8 +10,8 @@ import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { RatingForm } from '@/components/recipes/rating-form';
 import { submitRating } from './actions';
 
-export default function RecipePage({ params }: { params: { id: string } }) {
-  const recipe = getRecipeById(params.id);
+export default async function RecipePage({ params }: { params: { id: string } }) {
+  const recipe = await getRecipeById(params.id);
 
   if (!recipe) {
     notFound();

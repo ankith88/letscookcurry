@@ -1,6 +1,9 @@
 "use server";
 
 import { z } from 'zod';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, doc, runTransaction, getDoc } from 'firebase/firestore';
+import { revalidatePath } from 'next/cache';
 
 const ratingSchema = z.object({
   recipeId: z.string(),
@@ -21,13 +24,45 @@ export async function submitRating(formData: FormData) {
     };
   }
 
-  // In a real application, you would save this data to your database.
-  console.log('New rating submitted:');
-  console.log('Recipe ID:', validatedFields.data.recipeId);
-  console.log('Rating:', validatedFields.data.rating);
-  console.log('Comment:', validatedFields.data.comment);
+  const { recipeId, rating, comment } = validatedFields.data;
+  const recipeRef = doc(db, 'recipes', recipeId);
 
-  return {
-    message: "Thank you for your feedback!",
-  };
+  try {
+    await runTransaction(db, async (transaction) => {
+        const recipeDoc = await transaction.get(recipeRef);
+        if (!recipeDoc.exists()) {
+            throw "Document does not exist!";
+        }
+
+        // Add the new rating to a 'ratings' subcollection
+        const newRatingRef = doc(collection(db, 'recipes', recipeId, 'ratings'));
+        transaction.set(newRatingRef, { 
+            rating, 
+            comment, 
+            createdAt: new Date() 
+        });
+
+        // Update the aggregate rating on the recipe document
+        const currentData = recipeDoc.data();
+        const newReviews = (currentData.reviews || 0) + 1;
+        const newRating = ((currentData.rating || 0) * (currentData.reviews || 0) + rating) / newReviews;
+
+        transaction.update(recipeRef, { 
+            reviews: newReviews,
+            rating: newRating
+        });
+    });
+
+    revalidatePath(`/recipe/${recipeId}`);
+
+    return {
+      message: "Thank you for your feedback!",
+    };
+
+  } catch (e) {
+    console.error("Transaction failed: ", e);
+    return {
+        errors: { _form: ["Failed to submit rating. Please try again."] }
+    }
+  }
 }
