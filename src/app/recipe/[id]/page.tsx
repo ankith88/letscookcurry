@@ -61,7 +61,7 @@ export default async function RecipePage({ params }: { params: { id: string } })
               <div>
                 <h2 className="text-2xl font-headline font-semibold mb-3">Ingredients</h2>
                 <ul className="list-disc list-inside space-y-1 text-foreground/90">
-                  {recipe.ingredients.map((ingredient, index) => (
+                  {recipe.ingredients?.map((ingredient, index) => (
                     <li key={index}>{ingredient}</li>
                   ))}
                 </ul>
@@ -70,7 +70,7 @@ export default async function RecipePage({ params }: { params: { id: string } })
               <div>
                 <h2 className="text-2xl font-headline font-semibold mb-3">Instructions</h2>
                 <div className="space-y-4">
-                  {recipe.instructions.map((step, index) => (
+                  {recipe.instructions?.map((step, index) => (
                     <div key={index} className="flex items-start gap-3">
                       <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">
                         {index + 1}
