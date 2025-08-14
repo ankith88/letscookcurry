@@ -33,29 +33,23 @@ export default async function RecipePage({ params }: { params: { id: string } })
               />
             </CardContent>
           </Card>
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Rate this Recipe</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <RatingForm recipeId={recipe.id} submitRating={submitRating} />
-            </CardContent>
-          </Card>
         </div>
         <div className="lg:col-span-2">
-          <div className="sticky top-24">
-            <h1 className="text-4xl font-bold font-headline mb-2">{recipe.name}</h1>
-            <div className="flex items-center gap-4 mb-4">
-              <Badge variant="secondary" className="flex items-center gap-1 text-sm">
-                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                <span>{recipe.rating.toFixed(1)} ({recipe.reviews} reviews)</span>
-              </Badge>
+          <div className="space-y-8">
+            <div>
+              <h1 className="text-4xl font-bold font-headline mb-2">{recipe.name}</h1>
+              <div className="flex items-center gap-4 mb-4">
+                <Badge variant="secondary" className="flex items-center gap-1 text-sm">
+                  <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                  <span>{recipe.rating.toFixed(1)} ({recipe.reviews} reviews)</span>
+                </Badge>
+              </div>
+              <p className="text-muted-foreground mb-6">{recipe.longDescription}</p>
+
+              <AddToCartButton recipe={recipe} />
             </div>
-            <p className="text-muted-foreground mb-6">{recipe.longDescription}</p>
 
-            <AddToCartButton recipe={recipe} />
-
-            <Separator className="my-8" />
+            <Separator />
 
             <div className="space-y-6">
               <div>
@@ -81,6 +75,15 @@ export default async function RecipePage({ params }: { params: { id: string } })
                 </div>
               </div>
             </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Rate this Recipe</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <RatingForm recipeId={recipe.id} submitRating={submitRating} />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
