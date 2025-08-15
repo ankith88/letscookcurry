@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/firebase';
-import { collection, doc, setDoc, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, doc, setDoc, Timestamp } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
 const ratingSchema = z.object({
@@ -22,31 +22,19 @@ export async function POST(req: NextRequest) {
 
     const { recipeId, rating, comment } = validatedFields.data;
     
-    const recipeRef = doc(db, 'recipes', recipeId);
     const ratingsColRef = collection(db, `recipes/${recipeId}/ratings`);
     const newRatingRef = doc(ratingsColRef);
 
-    // Step 1: Add the new rating document to the subcollection.
+    // Add the new rating document to the subcollection.
+    // The logic to update the average rating on the recipe itself has been removed
+    // to avoid permission issues with Firestore security rules.
     await setDoc(newRatingRef, {
         rating,
         comment: comment || "",
         createdAt: Timestamp.now(),
     });
-
-    // Step 2: Recalculate the average rating and review count.
-    const ratingsSnapshot = await getDocs(ratingsColRef);
-    const allRatings = ratingsSnapshot.docs.map(doc => doc.data().rating as number);
     
-    const newReviews = allRatings.length;
-    const newAverageRating = newReviews > 0 ? allRatings.reduce((acc, curr) => acc + curr, 0) / newReviews : 0;
-
-    // Step 3: Update the main recipe document with the new values.
-    await updateDoc(recipeRef, {
-        reviews: newReviews,
-        rating: newAverageRating,
-    });
-    
-    // Step 4: Revalidate paths to clear server-side cache.
+    // Revalidate paths to clear server-side cache.
     revalidatePath(`/recipe/${recipeId}`);
     revalidatePath('/');
     
@@ -54,6 +42,8 @@ export async function POST(req: NextRequest) {
 
   } catch (e: any) {
     console.error("Error submitting rating:", e);
-    return NextResponse.json({ success: false, errors: { _form: [e.message || "An unexpected error occurred."] } }, { status: 500 });
+    // Return the actual error message for better debugging
+    const errorMessage = e.message || "An unexpected error occurred.";
+    return NextResponse.json({ success: false, errors: { _form: [errorMessage] } }, { status: 500 });
   }
 }
