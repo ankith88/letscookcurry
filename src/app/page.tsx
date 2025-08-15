@@ -12,6 +12,8 @@ export default async function Home() {
   const weeklyRecipes = await getWeeklyRecipes();
   const allRecipes = await getAllRecipes();
 
+  const hasWeeklyRecipes = weeklyRecipes.length > 0;
+
   return (
     <>
       <section className="relative h-screen w-full flex items-center justify-center text-center text-white overflow-hidden">
@@ -35,8 +37,8 @@ export default async function Home() {
           </p>
           <div className="mt-10">
             <Button asChild size="lg">
-              <Link href="#recipes">
-                Explore This Week's Recipes
+              <Link href={hasWeeklyRecipes ? "#recipes" : "#all-recipes"}>
+                {hasWeeklyRecipes ? "Explore This Week's Recipes" : "Explore All Recipes"}
                 <ArrowDown className="ml-2 h-5 w-5 animate-bounce" />
               </Link>
             </Button>
@@ -44,25 +46,25 @@ export default async function Home() {
         </div>
       </section>
 
-      <div id="recipes" className="container mx-auto px-4 py-16 sm:px-6 lg:py-24">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold font-headline tracking-tight text-primary sm:text-5xl">
-            This Week's Curries
-          </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-            Select your favorite meals for the week. All orders are delivered fresh on the following Monday.
-          </p>
-        </div>
-        {weeklyRecipes.length > 0 ? (
-           <RecipeGrid recipes={weeklyRecipes} cardType="cart" />
-        ) : (
-          <p className="text-center text-muted-foreground">No weekly specials at the moment. Check back soon!</p>
-        )}
-      </div>
+      {hasWeeklyRecipes && (
+        <>
+          <div id="recipes" className="container mx-auto px-4 py-16 sm:px-6 lg:py-24">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold font-headline tracking-tight text-primary sm:text-5xl">
+                This Week's Curries
+              </h2>
+              <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+                Select your favorite meals for the week. All orders are delivered fresh on the following Monday.
+              </p>
+            </div>
+            <RecipeGrid recipes={weeklyRecipes} cardType="cart" />
+          </div>
+          <Separator className="my-12 w-1/2 mx-auto" />
+        </>
+      )}
 
-      <Separator className="my-12 w-1/2 mx-auto" />
 
-      <div id="all-recipes" className="container mx-auto px-4 pb-16 sm:px-6 lg:pb-24">
+      <div id="all-recipes" className="container mx-auto px-4 pb-16 sm:px-6 lg:pb-24 pt-16">
         <div className="text-center mb-12">
            <h2 className="text-4xl font-bold font-headline tracking-tight text-foreground sm:text-5xl">
             Explore Our Full Menu
