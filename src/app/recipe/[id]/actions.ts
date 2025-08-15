@@ -3,7 +3,7 @@
 
 import { z } from 'zod';
 import { db } from '@/lib/firebase';
-import { collection, doc, runTransaction } from 'firebase/firestore';
+import { collection, doc, runTransaction, writeBatch, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
 const ratingSchema = z.object({
@@ -13,6 +13,8 @@ const ratingSchema = z.object({
 });
 
 export async function submitRating(formData: FormData) {
+  console.log("Submit rating function started.");
+
   const validatedFields = ratingSchema.safeParse({
     recipeId: formData.get('recipeId'),
     rating: formData.get('rating'),
@@ -27,54 +29,50 @@ export async function submitRating(formData: FormData) {
   }
 
   const { recipeId, rating, comment } = validatedFields.data;
+  console.log(`Validated data: recipeId=${recipeId}, rating=${rating}`);
   
   try {
     const recipeRef = doc(db, 'recipes', recipeId);
-    
-    await runTransaction(db, async (transaction) => {
-        const recipeDoc = await transaction.get(recipeRef);
-        if (!recipeDoc.exists()) {
-            throw new Error("Recipe not found.");
-        }
+    const newRatingRef = doc(collection(db, `recipes/${recipeId}/ratings`));
 
-        // Define the new rating document reference *inside* the transaction
-        const newRatingRef = doc(collection(db, `recipes/${recipeId}/ratings`));
-
-        // Calculate new average rating
-        const currentData = recipeDoc.data();
-        const currentRating = currentData.rating || 0;
-        const currentReviews = currentData.reviews || 0;
-
-        const newReviews = currentReviews + 1;
-        // Safeguard against division by zero, though newReviews should be > 0
-        const newRating = newReviews > 0 ? ((currentRating * currentReviews) + rating) / newReviews : rating;
-
-        // Update the recipe document with the new average rating and review count
-        transaction.update(recipeRef, {
-            reviews: newReviews,
-            rating: newRating,
-        });
-
-        // Create the new rating document in the subcollection
-        transaction.set(newRatingRef, {
-            rating,
-            comment: comment || "",
-            createdAt: new Date(),
-        });
+    console.log("Step 1: Creating new rating document.");
+    await setDoc(newRatingRef, {
+        rating,
+        comment: comment || "",
+        createdAt: new Date(),
     });
+    console.log("Successfully created new rating document:", newRatingRef.id);
+
+    console.log("Step 2: Updating recipe document.");
+    const recipeDoc = await getDoc(recipeRef);
+    if (!recipeDoc.exists()) {
+        throw new Error("Recipe not found during update step.");
+    }
+    const currentData = recipeDoc.data();
+    const currentRating = currentData.rating || 0;
+    const currentReviews = currentData.reviews || 0;
+    const newReviews = currentReviews + 1;
+    const newRating = ((currentRating * currentReviews) + rating) / newReviews;
+
+    await updateDoc(recipeRef, {
+        reviews: newReviews,
+        rating: newRating,
+    });
+    console.log("Successfully updated recipe document.");
     
     // Revalidate paths to show the new data immediately
     revalidatePath(`/recipe/${recipeId}`);
     revalidatePath('/');
 
+    console.log("Rating submission process completed successfully.");
     return {
       message: "Thank you for your feedback!",
     };
 
   } catch (e: any) {
-    console.error("Error submitting rating: ", e);
+    console.error("CRITICAL ERROR during rating submission: ", e);
     return {
-        errors: { _form: [e.message || "An unexpected error occurred. Please try again."] }
+        errors: { _form: [e.message || "An unexpected error occurred. Please check the logs."] }
     }
   }
 }

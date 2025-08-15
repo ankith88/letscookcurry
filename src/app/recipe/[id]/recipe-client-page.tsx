@@ -3,16 +3,15 @@
 
 import { getRecipeById, getRecipeRatings } from '@/lib/recipes';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Star, Soup, PlusCircle, DollarSign, MapPin, Leaf, MessageSquare, Ban } from 'lucide-react';
+import { Star, DollarSign, MapPin, Leaf, Ban } from 'lucide-react';
 import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { RatingForm } from '@/components/recipes/rating-form';
 import { submitRating } from './actions';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import type { Recipe, Rating } from '@/lib/types';
@@ -24,32 +23,28 @@ export default function RecipeClientPage({ recipeId }: { recipeId: string }) {
   const [loading, setLoading] = useState(true);
   const [orderableState, setOrderableState] = useState<'loading' | 'orderable' | 'closed'>('loading');
 
-
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
         const recipeData = await getRecipeById(recipeId);
         
-        if (!recipeData) {
-          notFound();
+        if (recipeData) {
+          const ratingsData = await getRecipeRatings(recipeId);
+          setRecipe(recipeData);
+          setRatings(ratingsData);
+        } else {
+            setRecipe(null); // Explicitly set to null if not found
         }
-
-        const ratingsData = await getRecipeRatings(recipeId);
-
-        setRecipe(recipeData);
-        setRatings(ratingsData);
       } catch (error) {
         console.error("Failed to fetch recipe data:", error);
-        // Maybe set an error state here to show in the UI
+        setRecipe(null);
       } finally {
         setLoading(false);
       }
     }
     fetchData();
 
-    // Day check is done on client to avoid hydration mismatch
-    // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu
     const today = new Date().getDay();
     setOrderableState(today >= 1 && today <= 4 ? 'orderable' : 'closed');
 
@@ -106,8 +101,12 @@ export default function RecipeClientPage({ recipeId }: { recipeId: string }) {
   }
 
   if (!recipe) {
-    // This will be caught by the notFound() in fetchData, but as a fallback:
-    return notFound();
+    return (
+        <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-2xl font-bold">Recipe not found</h1>
+            <p className="text-muted-foreground">The recipe you are looking for does not exist.</p>
+        </div>
+    )
   }
 
   return (
