@@ -28,10 +28,10 @@ export async function submitRating(formData: FormData) {
   const { recipeId, rating, comment } = validatedFields.data;
   
   try {
-    const recipeRef = doc(db, 'recipes', recipeId);
-    
     await runTransaction(db, async (transaction) => {
+        const recipeRef = doc(db, 'recipes', recipeId);
         const recipeDoc = await transaction.get(recipeRef);
+        
         if (!recipeDoc.exists()) {
             throw new Error("Recipe not found.");
         }
@@ -40,21 +40,18 @@ export async function submitRating(formData: FormData) {
         const currentRating = currentData.rating || 0;
         const currentReviews = currentData.reviews || 0;
 
-        // Calculate the new average rating
         const newReviews = currentReviews + 1;
-        const newRating = (currentRating * currentReviews + rating) / newReviews;
+        const newRating = ((currentRating * currentReviews) + rating) / newReviews;
         
-        // Update the recipe document with new average rating and review count
         transaction.update(recipeRef, { 
             reviews: newReviews,
             rating: newRating
         });
 
-        // Add the new rating to the 'ratings' subcollection
-        const newRatingRef = doc(collection(db, 'recipes', recipeId, 'ratings'));
+        const newRatingRef = doc(collection(db, `recipes/${recipeId}/ratings`));
         transaction.set(newRatingRef, { 
             rating, 
-            comment: comment || "", // Ensure comment is not undefined
+            comment: comment || "",
             createdAt: new Date() 
         });
     });
