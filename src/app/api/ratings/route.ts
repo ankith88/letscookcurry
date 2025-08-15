@@ -1,9 +1,8 @@
 
-"use server";
-
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/firebase';
-import { collection, doc, setDoc, updateDoc, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, doc, setDoc, getDocs, updateDoc, Timestamp } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
 const ratingSchema = z.object({
@@ -12,24 +11,17 @@ const ratingSchema = z.object({
   comment: z.string().min(10, "Comment must be at least 10 characters long.").max(500, "Comment cannot exceed 500 characters.").optional().or(z.literal('')),
 });
 
-export async function submitRating(formData: FormData) {
-  const validatedFields = ratingSchema.safeParse({
-    recipeId: formData.get('recipeId'),
-    rating: formData.get('rating'),
-    comment: formData.get('comment'),
-  });
-
-  if (!validatedFields.success) {
-    console.error("Validation failed:", validatedFields.error.flatten().fieldErrors);
-    return {
-      success: false,
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
-  }
-
-  const { recipeId, rating, comment } = validatedFields.data;
-  
+export async function POST(req: NextRequest) {
   try {
+    const body = await req.json();
+    const validatedFields = ratingSchema.safeParse(body);
+
+    if (!validatedFields.success) {
+      return NextResponse.json({ success: false, errors: validatedFields.error.flatten().fieldErrors }, { status: 400 });
+    }
+
+    const { recipeId, rating, comment } = validatedFields.data;
+    
     const recipeRef = doc(db, 'recipes', recipeId);
     const ratingsColRef = collection(db, `recipes/${recipeId}/ratings`);
     const newRatingRef = doc(ratingsColRef);
@@ -57,14 +49,11 @@ export async function submitRating(formData: FormData) {
     // Step 4: Revalidate paths to clear server-side cache.
     revalidatePath(`/recipe/${recipeId}`);
     revalidatePath('/');
+    
+    return NextResponse.json({ success: true }, { status: 200 });
 
   } catch (e: any) {
     console.error("Error submitting rating:", e);
-    return {
-        success: false,
-        errors: { _form: [e.message || "An unexpected error occurred."] }
-    }
+    return NextResponse.json({ success: false, errors: { _form: [e.message || "An unexpected error occurred."] } }, { status: 500 });
   }
-
-  return { success: true };
 }

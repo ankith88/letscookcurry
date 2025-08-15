@@ -12,10 +12,9 @@ import { AlertCircle } from 'lucide-react';
 
 interface RatingFormProps {
   recipeId: string;
-  submitRating: (formData: FormData) => Promise<{ success?: boolean; errors?: any }>;
 }
 
-export function RatingForm({ recipeId, submitRating }: RatingFormProps) {
+export function RatingForm({ recipeId }: RatingFormProps) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -25,24 +24,51 @@ export function RatingForm({ recipeId, submitRating }: RatingFormProps) {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (rating === 0) return;
+    if (rating === 0) {
+        setFormState({ errors: { rating: ["Please select a rating."] }});
+        return;
+    };
 
-    const formData = new FormData(event.currentTarget);
-    formData.set('rating', rating.toString());
+    setFormState(null);
+
+    const formData = {
+        recipeId,
+        rating,
+        comment,
+    };
     
     startTransition(async () => {
-      const result = await submitRating(formData);
-      setFormState(result);
-      if (result.success) {
-        toast({
-            title: "Success!",
-            description: "Your review has been submitted. The page will now reload.",
-        });
-        // Force a reload to show fresh data and avoid HMR issues.
-        setTimeout(() => {
-            window.location.reload();
-        }, 1500);
-      }
+        try {
+            const response = await fetch('/api/ratings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                 setFormState(result || { success: false, errors: { _form: ["An unknown error occurred."] } });
+                 return;
+            }
+            
+            if (result.success) {
+                toast({
+                    title: "Success!",
+                    description: "Your review has been submitted. The page will now reload.",
+                });
+                // Force a reload to show fresh data and avoid HMR issues.
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                 setFormState(result);
+            }
+        } catch (error) {
+             setFormState({ success: false, errors: { _form: ["An unexpected network error occurred."] } });
+        }
     });
   };
 
@@ -58,7 +84,6 @@ export function RatingForm({ recipeId, submitRating }: RatingFormProps) {
         </Alert>
        )}
 
-      <input type="hidden" name="recipeId" value={recipeId} />
       <div>
         <label className="block text-sm font-medium text-foreground mb-2">Your Rating</label>
         <div className="flex items-center gap-1">

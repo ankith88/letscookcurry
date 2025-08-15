@@ -9,7 +9,6 @@ import { Separator } from '@/components/ui/separator';
 import { Star, DollarSign, MapPin, Leaf, Ban, Loader2 } from 'lucide-react';
 import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { RatingForm } from '@/components/recipes/rating-form';
-import { submitRating } from './actions';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
@@ -32,10 +31,6 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
     // Monday to Thursday (1-4)
     setOrderableState(today >= 1 && today <= 4 ? 'orderable' : 'closed');
   }, []);
-
-  const handleRatingSubmit = async (formData: FormData) => {
-    return await submitRating(formData);
-  };
   
   const renderOrderButton = () => {
      if (!recipe?.isWeekly) return null;
@@ -143,7 +138,7 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
                 <CardTitle>Rate this Recipe</CardTitle>
                 </CardHeader>
                 <CardContent>
-                <RatingForm recipeId={recipe.id} submitRating={handleRatingSubmit} />
+                <RatingForm recipeId={recipe.id} />
                 </CardContent>
             </Card>
              <Card className="mt-8">
