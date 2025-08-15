@@ -1,4 +1,6 @@
 
+"use client";
+
 import { getRecipeById, getRecipeRatings } from '@/lib/recipes';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -6,16 +8,83 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Star, Soup, PlusCircle, DollarSign, MapPin, Leaf, MessageSquare } from 'lucide-react';
+import { Star, Soup, PlusCircle, DollarSign, MapPin, Leaf, MessageSquare, Ban } from 'lucide-react';
 import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { RatingForm } from '@/components/recipes/rating-form';
 import { submitRating } from './actions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import type { Recipe, Rating } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export default async function RecipePage({ params }: { params: { id: string } }) {
-  const recipe = await getRecipeById(params.id);
-  const ratings = await getRecipeRatings(params.id);
+export default function RecipePage({ params }: { params: { id: string } }) {
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [ratings, setRatings] = useState<Rating[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isOrderable, setIsOrderable] = useState(false);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const [recipeData, ratingsData] = await Promise.all([
+          getRecipeById(params.id),
+          getRecipeRatings(params.id),
+        ]);
+        
+        if (!recipeData) {
+          notFound();
+        }
+
+        setRecipe(recipeData);
+        setRatings(ratingsData);
+      } catch (error) {
+        console.error("Failed to fetch recipe data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+
+    // Day check is done on client to avoid hydration mismatch
+    // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu
+    const today = new Date().getDay();
+    setIsOrderable(today >= 1 && today <= 4);
+
+  }, [params.id]);
+
+
+  if (loading) {
+    return (
+       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+          <div className="lg:col-span-3">
+             <Card className="overflow-hidden">
+                <Skeleton className="w-full h-[600px]" />
+            </Card>
+          </div>
+          <div className="lg:col-span-2 space-y-6">
+            <Skeleton className="h-10 w-3/4" />
+            <div className="flex gap-2">
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-6 w-20" />
+                <Skeleton className="h-6 w-20" />
+            </div>
+            <Skeleton className="h-24 w-full" />
+             <Skeleton className="h-12 w-full" />
+             <Separator />
+              <div className="space-y-4">
+                <Skeleton className="h-8 w-1/2" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+              </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (!recipe) {
     notFound();
@@ -97,7 +166,16 @@ export default async function RecipePage({ params }: { params: { id: string } })
                  </span>
               </div>
               
-              {recipe.isWeekly && <AddToCartButton recipe={recipe} />}
+               {recipe.isWeekly && (
+                isOrderable ? (
+                    <AddToCartButton recipe={recipe} />
+                ) : (
+                    <Button size="lg" className="w-full" disabled>
+                        <Ban className="mr-2 h-5 w-5" />
+                        Ordering Closed
+                    </Button>
+                )
+            )}
             </div>
 
             <Separator />

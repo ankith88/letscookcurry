@@ -25,9 +25,9 @@ export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange:
 
   useEffect(() => {
     // Day check is done on client to avoid hydration mismatch
-    // 0 = Sunday, 1 = Monday, ..., 4 = Thursday
+    // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu
     const today = new Date().getDay();
-    setIsOrderable(today === 4);
+    setIsOrderable(today >= 1 && today <= 4);
   }, [open]);
 
 
@@ -44,7 +44,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange:
         <SheetHeader className="px-6">
           <SheetTitle>Shopping Cart ({items.length})</SheetTitle>
           <SheetDescription>
-            Review your weekly recipes. You can place your order every Thursday.
+            Review your weekly recipes. You can place your order from Monday to Thursday.
           </SheetDescription>
         </SheetHeader>
         <Separator />
@@ -88,7 +88,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange:
                     <AlertCircle className="h-4 w-4 !text-yellow-600 dark:!text-yellow-400" />
                     <AlertTitle className="text-yellow-800 dark:text-yellow-200">Ordering is currently closed</AlertTitle>
                     <AlertDescription className="text-yellow-700 dark:text-yellow-300">
-                      You can only place orders on Thursdays.
+                      You can only place orders from Monday to Thursday.
                     </AlertDescription>
                   </Alert>
                 )}
