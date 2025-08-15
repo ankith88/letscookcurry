@@ -17,7 +17,7 @@ import type { Recipe, Rating } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface RecipeClientPageProps {
-  initialRecipe: Recipe | null;
+  initialRecipe: Recipe;
   initialRatings: Rating[];
 }
 
