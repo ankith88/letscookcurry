@@ -30,13 +30,15 @@ export async function submitRating(formData: FormData) {
   
   try {
     const recipeRef = doc(db, 'recipes', recipeId);
-    const newRatingRef = doc(collection(db, `recipes/${recipeId}/ratings`));
-
+    
     await runTransaction(db, async (transaction) => {
         const recipeDoc = await transaction.get(recipeRef);
         if (!recipeDoc.exists()) {
             throw new Error("Recipe not found.");
         }
+
+        // Define the new rating document reference *inside* the transaction
+        const newRatingRef = doc(collection(db, `recipes/${recipeId}/ratings`));
 
         // Calculate new average rating
         const currentData = recipeDoc.data();
