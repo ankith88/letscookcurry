@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -6,14 +7,15 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { Recipe } from '@/lib/types';
-import { Star, PlusCircle, DollarSign, MapPin, Leaf } from 'lucide-react';
+import { Star, PlusCircle, DollarSign, MapPin, Leaf, Eye } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 
 interface RecipeCardProps {
   recipe: Recipe;
+  cardType: 'cart' | 'view';
 }
 
-export function RecipeCard({ recipe }: RecipeCardProps) {
+export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
   const { addItem } = useCart();
 
   return (
@@ -60,9 +62,17 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
 
       </CardContent>
       <CardFooter className="p-6 pt-0">
-        <Button className="w-full" onClick={() => addItem(recipe)}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add to Cart
-        </Button>
+        {cardType === 'cart' ? (
+            <Button className="w-full" onClick={() => addItem(recipe)}>
+              <PlusCircle className="mr-2 h-4 w-4" /> Add to Cart
+            </Button>
+        ) : (
+            <Button asChild className="w-full" variant="secondary">
+                <Link href={`/recipe/${recipe.id}`}>
+                    <Eye className="mr-2 h-4 w-4" /> View Recipe
+                </Link>
+            </Button>
+        )}
       </CardFooter>
     </Card>
   );

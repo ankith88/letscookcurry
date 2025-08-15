@@ -1,3 +1,4 @@
+
 import { RecipeGrid } from '@/components/recipes/recipe-grid';
 import { getAllRecipes, getWeeklyRecipes } from '@/lib/recipes';
 import Image from 'next/image';
@@ -52,7 +53,7 @@ export default async function Home() {
           </p>
         </div>
         {weeklyRecipes.length > 0 ? (
-           <RecipeGrid recipes={weeklyRecipes} />
+           <RecipeGrid recipes={weeklyRecipes} cardType="cart" />
         ) : (
           <p className="text-center text-muted-foreground">No weekly specials at the moment. Check back soon!</p>
         )}
@@ -69,7 +70,7 @@ export default async function Home() {
             Craving something different? Browse through our entire collection of authentic recipes.
           </p>
         </div>
-        <RecipeGrid recipes={allRecipes} />
+        <RecipeGrid recipes={allRecipes} cardType="view" />
       </div>
 
     </>
