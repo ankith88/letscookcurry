@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Star, Soup, PlusCircle, IndianRupee, MapPin, Leaf } from 'lucide-react';
+import { Star, Soup, PlusCircle, DollarSign, MapPin, Leaf } from 'lucide-react';
 import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { RatingForm } from '@/components/recipes/rating-form';
 import { submitRating } from './actions';
@@ -33,14 +33,6 @@ export default async function RecipePage({ params }: { params: { id: string } })
               />
             </CardContent>
           </Card>
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Rate this Recipe</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <RatingForm recipeId={recipe.id} submitRating={submitRating} />
-            </CardContent>
-          </Card>
         </div>
         <div className="lg:col-span-2">
           <div className="space-y-6">
@@ -64,7 +56,7 @@ export default async function RecipePage({ params }: { params: { id: string } })
 
               <div className="flex items-center justify-between mb-6">
                  <span className="text-3xl font-bold flex items-center gap-2">
-                    <IndianRupee className="w-6 h-6" />
+                    <DollarSign className="w-6 h-6" />
                     {recipe.price}
                  </span>
               </div>
@@ -98,6 +90,14 @@ export default async function RecipePage({ params }: { params: { id: string } })
                 </div>
               </div>
             </div>
+            <Card className="mt-8">
+                <CardHeader>
+                <CardTitle>Rate this Recipe</CardTitle>
+                </CardHeader>
+                <CardContent>
+                <RatingForm recipeId={recipe.id} submitRating={submitRating} />
+                </CardContent>
+            </Card>
           </div>
         </div>
       </div>
