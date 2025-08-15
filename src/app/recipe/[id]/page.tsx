@@ -1,3 +1,4 @@
+
 import { getRecipeById, getRecipeRatings } from '@/lib/recipes';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -10,6 +11,7 @@ import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { RatingForm } from '@/components/recipes/rating-form';
 import { submitRating } from './actions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 export default async function RecipePage({ params }: { params: { id: string } }) {
   const recipe = await getRecipeById(params.id);
@@ -95,7 +97,7 @@ export default async function RecipePage({ params }: { params: { id: string } })
                  </span>
               </div>
               
-              <AddToCartButton recipe={recipe} />
+              {recipe.isWeekly && <AddToCartButton recipe={recipe} />}
             </div>
 
             <Separator />
