@@ -3,7 +3,7 @@
 
 import { z } from 'zod';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, getDoc, runTransaction } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
 const ratingSchema = z.object({
@@ -29,35 +29,38 @@ export async function submitRating(formData: FormData) {
   const { recipeId, rating, comment } = validatedFields.data;
   
   try {
-    // 1. Add the new rating to the subcollection
-    const ratingsColRef = collection(db, `recipes/${recipeId}/ratings`);
-    await addDoc(ratingsColRef, {
-      rating,
-      comment: comment || "",
-      createdAt: new Date(),
-    });
-
-    // 2. Update the aggregate rating on the recipe document
     const recipeRef = doc(db, 'recipes', recipeId);
-    const recipeDoc = await getDoc(recipeRef);
 
-    if (!recipeDoc.exists()) {
-      throw new Error("Recipe not found.");
-    }
+    await runTransaction(db, async (transaction) => {
+        const recipeDoc = await transaction.get(recipeRef);
+        if (!recipeDoc.exists()) {
+            throw new Error("Recipe not found.");
+        }
 
-    const currentData = recipeDoc.data();
-    const currentRating = currentData.rating || 0;
-    const currentReviews = currentData.reviews || 0;
+        // Calculate new average rating
+        const currentData = recipeDoc.data();
+        const currentRating = currentData.rating || 0;
+        const currentReviews = currentData.reviews || 0;
 
-    const newReviews = currentReviews + 1;
-    const newRating = ((currentRating * currentReviews) + rating) / newReviews;
+        const newReviews = currentReviews + 1;
+        const newRating = ((currentRating * currentReviews) + rating) / newReviews;
 
-    await updateDoc(recipeRef, {
-      reviews: newReviews,
-      rating: newRating,
+        // Update the recipe document
+        transaction.update(recipeRef, {
+            reviews: newReviews,
+            rating: newRating,
+        });
+
+        // Add the new rating to the subcollection
+        const newRatingRef = doc(collection(db, `recipes/${recipeId}/ratings`));
+        transaction.set(newRatingRef, {
+            rating,
+            comment: comment || "",
+            createdAt: new Date(),
+        });
     });
     
-    // 3. Revalidate paths to show the new data
+    // Revalidate paths to show the new data
     revalidatePath(`/recipe/${recipeId}`);
     revalidatePath('/');
 
