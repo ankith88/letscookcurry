@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -6,12 +7,12 @@ export default function AboutPage() {
     <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
       <Card className="max-w-4xl mx-auto overflow-hidden">
         <div className="md:flex">
-          <div className="md:w-1/2">
+          <div className="md:w-1/2 relative min-h-[300px] md:min-h-0">
              <Image
                 src="https://firebasestorage.googleapis.com/v0/b/lets-cook-curry-xrwg7.firebasestorage.app/o/PXL_20231210_143941853.jpg?alt=media&token=9db8e8c0-8806-46ff-84c1-79421d0bb1fa"
                 alt="Tanvi and Ankith"
-                width={600}
-                height={800}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="w-full h-full object-cover"
                 data-ai-hint="couple cooking"
               />
