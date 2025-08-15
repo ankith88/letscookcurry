@@ -29,7 +29,7 @@ export default async function Home() {
             From Our Kitchen to Yours
           </h1>
           <p className="mt-6 max-w-2xl mx-auto text-lg text-white/90 drop-shadow-md">
-            Discover delicious, easy-to-make curry recipes. New choices every single Monday to spice up your week!
+            Create unforgettable meals and lasting memories, one curry at a time. New choices to order every single Monday to spice up your week!
           </p>
           <div className="mt-10">
             <Button asChild size="lg">
