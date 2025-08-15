@@ -26,45 +26,50 @@ export async function submitRating(formData: FormData) {
   }
 
   const { recipeId, rating, comment } = validatedFields.data;
-  const recipeRef = doc(db, 'recipes', recipeId);
-
+  
   try {
+    const recipeRef = doc(db, 'recipes', recipeId);
+    
     await runTransaction(db, async (transaction) => {
         const recipeDoc = await transaction.get(recipeRef);
         if (!recipeDoc.exists()) {
-            throw "Document does not exist!";
+            throw new Error("Recipe not found.");
         }
 
-        // Add the new rating to a 'ratings' subcollection
-        const newRatingRef = doc(collection(db, 'recipes', recipeId, 'ratings'));
-        transaction.set(newRatingRef, { 
-            rating, 
-            comment, 
-            createdAt: new Date() 
-        });
-
-        // Update the aggregate rating on the recipe document
         const currentData = recipeDoc.data();
-        const newReviews = (currentData.reviews || 0) + 1;
-        const newRating = ((currentData.rating || 0) * (currentData.reviews || 0) + rating) / newReviews;
+        const currentRating = currentData.rating || 0;
+        const currentReviews = currentData.reviews || 0;
 
+        // Calculate the new average rating
+        const newReviews = currentReviews + 1;
+        const newRating = (currentRating * currentReviews + rating) / newReviews;
+        
+        // Update the recipe document with new average rating and review count
         transaction.update(recipeRef, { 
             reviews: newReviews,
             rating: newRating
         });
+
+        // Add the new rating to the 'ratings' subcollection
+        const newRatingRef = doc(collection(db, 'recipes', recipeId, 'ratings'));
+        transaction.set(newRatingRef, { 
+            rating, 
+            comment: comment || "", // Ensure comment is not undefined
+            createdAt: new Date() 
+        });
     });
 
     revalidatePath(`/recipe/${recipeId}`);
-    revalidatePath('/'); // Also revalidate home page in case the recipe is there
+    revalidatePath('/'); 
 
     return {
       message: "Thank you for your feedback!",
     };
 
-  } catch (e) {
+  } catch (e: any) {
     console.error("Transaction failed: ", e);
     return {
-        errors: { _form: ["Failed to submit rating. Please try again."] }
+        errors: { _form: [e.message || "Failed to submit rating. Please try again."] }
     }
   }
 }
