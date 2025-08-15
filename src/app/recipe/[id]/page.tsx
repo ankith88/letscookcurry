@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { getRecipeById, getRecipeRatings } from '@/lib/recipes';

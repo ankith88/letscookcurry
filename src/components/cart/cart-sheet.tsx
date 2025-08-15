@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 
 export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
   const { items, removeItem, clearCart } = useCart();
-  const [isOrderable, setIsOrderable] = useState(false);
+  const [isOrderable, setIsOrderable] = useState(true); // Default to true to avoid flash of disabled content
 
   const totalPrice = items.reduce((total, item) => total + item.price, 0);
 
@@ -29,7 +29,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange:
     // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu
     const today = new Date().getDay();
     setIsOrderable(today >= 1 && today <= 4);
-  }, [open]);
+  }, []);
 
 
   const handleCheckout = () => {
