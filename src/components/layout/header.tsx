@@ -25,14 +25,14 @@ export function Header() {
           />
           <span className="font-bold font-headline inline-block">Let's Cook Curry</span>
         </Link>
-        <nav className="flex-1 items-center space-x-6 text-sm font-medium hidden sm:flex">
-          <Link href="/" className="text-foreground/60 transition-colors hover:text-foreground/80">
+        <nav className="flex-1 items-center space-x-2 text-sm font-medium hidden sm:flex">
+          <Link href="/" className="text-foreground/80 transition-colors hover:text-white hover:bg-nav-hover px-3 py-2 rounded-full">
             Home
           </Link>
-          <Link href="/about" className="text-foreground/60 transition-colors hover:text-foreground/80">
+          <Link href="/about" className="text-foreground/80 transition-colors hover:text-white hover:bg-nav-hover px-3 py-2 rounded-full">
             About Us
           </Link>
-          <Link href="/profile" className="text-foreground/60 transition-colors hover:text-foreground/80">
+          <Link href="/profile" className="text-foreground/80 transition-colors hover:text-white hover:bg-nav-hover px-3 py-2 rounded-full">
             Profile
           </Link>
         </nav>
