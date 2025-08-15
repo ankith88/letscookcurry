@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import {
@@ -20,11 +21,13 @@ import { useEffect, useState } from 'react';
 
 export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
   const { items, removeItem, clearCart } = useCart();
-  const [isOrderable, setIsOrderable] = useState(true); // Default to true to avoid flash of disabled content
+  const [isClient, setIsClient] = useState(false);
+  const [isOrderable, setIsOrderable] = useState(false);
 
   const totalPrice = items.reduce((total, item) => total + item.price, 0);
 
   useEffect(() => {
+    setIsClient(true);
     // Day check is done on client to avoid hydration mismatch
     // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu
     const today = new Date().getDay();
@@ -66,7 +69,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange:
                       />
                       <div>
                         <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-muted-foreground">${item.price}</p>
+                        <p className="text-sm text-muted-foreground">${item.price.toFixed(2)}</p>
                       </div>
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)}>
@@ -84,7 +87,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange:
                   <span>${totalPrice.toFixed(2)}</span>
                 </div>
                 <Separator />
-                {!isOrderable && (
+                {isClient && !isOrderable && (
                   <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800">
                     <AlertCircle className="h-4 w-4 !text-yellow-600 dark:!text-yellow-400" />
                     <AlertTitle className="text-yellow-800 dark:text-yellow-200">Ordering is currently closed</AlertTitle>
@@ -93,7 +96,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange:
                     </AlertDescription>
                   </Alert>
                 )}
-                <Button onClick={handleCheckout} disabled={!isOrderable} className="w-full">
+                <Button onClick={handleCheckout} disabled={!isOrderable || !isClient} className="w-full">
                   Place Order
                 </Button>
                 <Button variant="outline" onClick={clearCart} className="w-full">

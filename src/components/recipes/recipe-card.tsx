@@ -10,6 +10,7 @@ import type { Recipe } from '@/lib/types';
 import { Star, PlusCircle, DollarSign, MapPin, Leaf, Eye, Ban } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { useEffect, useState } from 'react';
+import { Skeleton } from '../ui/skeleton';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -18,14 +19,33 @@ interface RecipeCardProps {
 
 export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
   const { addItem } = useCart();
-  const [isOrderable, setIsOrderable] = useState(false);
+  const [orderableState, setOrderableState] = useState<'loading' | 'orderable' | 'closed'>('loading');
 
   useEffect(() => {
     // Day check is done on client to avoid hydration mismatch
     // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu
     const today = new Date().getDay();
-    setIsOrderable(today >= 1 && today <= 4);
+    setOrderableState(today >= 1 && today <= 4 ? 'orderable' : 'closed');
   }, []);
+
+  const renderCartButton = () => {
+    switch (orderableState) {
+      case 'loading':
+        return <Skeleton className="h-10 w-full" />;
+      case 'orderable':
+        return (
+          <Button className="w-full" onClick={() => addItem(recipe)}>
+            <PlusCircle className="mr-2 h-4 w-4" /> Add to Cart
+          </Button>
+        );
+      case 'closed':
+        return (
+          <Button className="w-full" disabled>
+            <Ban className="mr-2 h-4 w-4" /> Ordering Closed
+          </Button>
+        );
+    }
+  };
 
   return (
     <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
@@ -72,15 +92,7 @@ export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
       </CardContent>
       <CardFooter className="p-6 pt-0">
         {cardType === 'cart' ? (
-          isOrderable ? (
-            <Button className="w-full" onClick={() => addItem(recipe)}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Add to Cart
-            </Button>
-          ) : (
-             <Button className="w-full" disabled>
-              <Ban className="mr-2 h-4 w-4" /> Ordering Closed
-            </Button>
-          )
+          renderCartButton()
         ) : (
             <Button asChild className="w-full" variant="secondary">
                 <Link href={`/recipe/${recipe.id}`}>

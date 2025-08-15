@@ -1,3 +1,4 @@
+
 "use client";
 
 import { getRecipeById, getRecipeRatings } from '@/lib/recipes';
@@ -21,7 +22,8 @@ export default function RecipeClientPage({ recipeId }: { recipeId: string }) {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isOrderable, setIsOrderable] = useState(false);
+  const [orderableState, setOrderableState] = useState<'loading' | 'orderable' | 'closed'>('loading');
+
 
   useEffect(() => {
     async function fetchData() {
@@ -49,9 +51,27 @@ export default function RecipeClientPage({ recipeId }: { recipeId: string }) {
     // Day check is done on client to avoid hydration mismatch
     // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu
     const today = new Date().getDay();
-    setIsOrderable(today >= 1 && today <= 4);
+    setOrderableState(today >= 1 && today <= 4 ? 'orderable' : 'closed');
 
   }, [recipeId]);
+
+  const renderOrderButton = () => {
+     if (!recipe?.isWeekly) return null;
+
+     switch (orderableState) {
+        case 'loading':
+            return <Skeleton className="h-12 w-full" />;
+        case 'orderable':
+            return <AddToCartButton recipe={recipe} />;
+        case 'closed':
+            return (
+                <Button size="lg" className="w-full" disabled>
+                    <Ban className="mr-2 h-5 w-5" />
+                    Ordering Closed
+                </Button>
+            );
+     }
+  }
 
 
   if (loading) {
@@ -166,16 +186,8 @@ export default function RecipeClientPage({ recipeId }: { recipeId: string }) {
                  </span>
               </div>
               
-               {recipe.isWeekly && (
-                isOrderable ? (
-                    <AddToCartButton recipe={recipe} />
-                ) : (
-                    <Button size="lg" className="w-full" disabled>
-                        <Ban className="mr-2 h-5 w-5" />
-                        Ordering Closed
-                    </Button>
-                )
-            )}
+              {renderOrderButton()}
+
             </div>
 
             <Separator />
