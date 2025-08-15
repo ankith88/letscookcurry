@@ -8,7 +8,7 @@ export default function AboutPage() {
         <div className="md:flex">
           <div className="md:w-1/2">
              <Image
-                src="https://placehold.co/600x800.png"
+                src="https://firebasestorage.googleapis.com/v0/b/lets-cook-curry-xrwg7.firebasestorage.app/o/PXL_20231210_143941853.jpg?alt=media&token=9db8e8c0-8806-46ff-84c1-79421d0bb1fa"
                 alt="Tanvi and Ankith"
                 width={600}
                 height={800}
