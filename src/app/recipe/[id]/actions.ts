@@ -30,6 +30,7 @@ export async function submitRating(formData: FormData) {
   
   try {
     const recipeRef = doc(db, 'recipes', recipeId);
+    const newRatingRef = doc(collection(db, `recipes/${recipeId}/ratings`));
 
     await runTransaction(db, async (transaction) => {
         const recipeDoc = await transaction.get(recipeRef);
@@ -52,7 +53,6 @@ export async function submitRating(formData: FormData) {
         });
 
         // Add the new rating to the subcollection
-        const newRatingRef = doc(collection(db, `recipes/${recipeId}/ratings`));
         transaction.set(newRatingRef, {
             rating,
             comment: comment || "",
