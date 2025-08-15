@@ -15,7 +15,7 @@ export default async function Home() {
       <section className="relative h-screen w-full flex items-center justify-center text-center text-white overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://placehold.co/1920x1080.png"
+            src="https://firebasestorage.googleapis.com/v0/b/lets-cook-curry-xrwg7.firebasestorage.app/o/main_image-v2-2048%20(1).jpg?alt=media&token=c8e72a75-16ec-4f4e-91d0-aa0c8835e9f7"
             alt="An assortment of delicious curries"
             fill
             className="object-cover"
@@ -26,7 +26,7 @@ export default async function Home() {
         </div>
         <div className="relative z-10 p-4 max-w-3xl">
           <h1 className="text-4xl font-bold font-headline tracking-tight text-white sm:text-5xl lg:text-7xl !leading-tight drop-shadow-lg">
-            Authentic Indian Flavors, Delivered Weekly
+            From Our Kitchen to Yours
           </h1>
           <p className="mt-6 max-w-2xl mx-auto text-lg text-white/90 drop-shadow-md">
             Discover delicious, easy-to-make curry recipes. New choices every single Monday to spice up your week!

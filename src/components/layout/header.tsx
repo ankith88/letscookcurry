@@ -16,7 +16,7 @@ export function Header() {
       <div className="container flex h-16 items-center pl-4">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <Image
-            src="https://raw.githubusercontent.com/ankith88/letscookcurry/master/assets/images/lcc_logo.png"
+            src="https://firebasestorage.googleapis.com/v0/b/lets-cook-curry-xrwg7.firebasestorage.app/o/letscookcurry-%20logo.png?alt=media&token=39f4c042-7108-4a35-8ce0-5ba1d2ab4314"
             alt="Let's Cook Curry Logo"
             width={40}
             height={40}
