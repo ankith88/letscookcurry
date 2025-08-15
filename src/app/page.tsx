@@ -1,12 +1,14 @@
 import { RecipeGrid } from '@/components/recipes/recipe-grid';
-import { getWeeklyRecipes } from '@/lib/recipes';
+import { getAllRecipes, getWeeklyRecipes } from '@/lib/recipes';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, ChefHat } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 export default async function Home() {
-  const recipes = await getWeeklyRecipes();
+  const weeklyRecipes = await getWeeklyRecipes();
+  const allRecipes = await getAllRecipes();
 
   return (
     <>
@@ -49,8 +51,27 @@ export default async function Home() {
             Select your favorite meals for the week. All orders are delivered fresh on the following Monday.
           </p>
         </div>
-        <RecipeGrid recipes={recipes} />
+        {weeklyRecipes.length > 0 ? (
+           <RecipeGrid recipes={weeklyRecipes} />
+        ) : (
+          <p className="text-center text-muted-foreground">No weekly specials at the moment. Check back soon!</p>
+        )}
       </div>
+
+      <Separator className="my-12 w-1/2 mx-auto" />
+
+      <div id="all-recipes" className="container mx-auto px-4 pb-16 sm:px-6 lg:pb-24">
+        <div className="text-center mb-12">
+           <h2 className="text-4xl font-bold font-headline tracking-tight text-foreground sm:text-5xl">
+            Explore Our Full Menu
+          </h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+            Craving something different? Browse through our entire collection of authentic recipes.
+          </p>
+        </div>
+        <RecipeGrid recipes={allRecipes} />
+      </div>
+
     </>
   );
 }

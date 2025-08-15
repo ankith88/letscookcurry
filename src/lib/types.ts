@@ -12,6 +12,7 @@ export type Recipe = {
   price: number;
   region: "South" | "North" | "West" | "East";
   diet: "Non-Veg" | "Veg";
+  isWeekly?: boolean;
 };
 
 export type Order = {
