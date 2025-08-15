@@ -3,7 +3,7 @@
 
 import { z } from 'zod';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, doc, updateDoc, getDoc, runTransaction } from 'firebase/firestore';
+import { collection, doc, runTransaction } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
 const ratingSchema = z.object({
@@ -46,15 +46,16 @@ export async function submitRating(formData: FormData) {
         const currentReviews = currentData.reviews || 0;
 
         const newReviews = currentReviews + 1;
-        const newRating = ((currentRating * currentReviews) + rating) / newReviews;
+        // Safeguard against division by zero, though newReviews should be > 0
+        const newRating = newReviews > 0 ? ((currentRating * currentReviews) + rating) / newReviews : rating;
 
-        // Update the recipe document
+        // Update the recipe document with the new average rating and review count
         transaction.update(recipeRef, {
             reviews: newReviews,
             rating: newRating,
         });
 
-        // Add the new rating to the subcollection
+        // Create the new rating document in the subcollection
         transaction.set(newRatingRef, {
             rating,
             comment: comment || "",
@@ -62,7 +63,7 @@ export async function submitRating(formData: FormData) {
         });
     });
     
-    // Revalidate paths to show the new data
+    // Revalidate paths to show the new data immediately
     revalidatePath(`/recipe/${recipeId}`);
     revalidatePath('/');
 
