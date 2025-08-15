@@ -3,7 +3,7 @@
 
 import { z } from 'zod';
 import { db } from '@/lib/firebase';
-import { collection, doc, runTransaction, writeBatch, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
 
 const ratingSchema = z.object({
@@ -29,7 +29,7 @@ export async function submitRating(formData: FormData) {
   }
 
   const { recipeId, rating, comment } = validatedFields.data;
-  console.log(`Validated data: recipeId=${recipeId}, rating=${rating}`);
+  console.log(`Validated data: recipeId=${recipeId}, rating=${rating}, comment=${comment}`);
   
   try {
     const recipeRef = doc(db, 'recipes', recipeId);
@@ -43,24 +43,30 @@ export async function submitRating(formData: FormData) {
     });
     console.log("Successfully created new rating document:", newRatingRef.id);
 
-    console.log("Step 2: Updating recipe document.");
+    console.log("Step 2: Fetching recipe for update.");
     const recipeDoc = await getDoc(recipeRef);
     if (!recipeDoc.exists()) {
         throw new Error("Recipe not found during update step.");
     }
+    
+    console.log("Step 3: Calculating new average rating.");
     const currentData = recipeDoc.data();
     const currentRating = currentData.rating || 0;
     const currentReviews = currentData.reviews || 0;
+
     const newReviews = currentReviews + 1;
+    // Formula to calculate new average: ((old_average * old_count) + new_value) / new_count
     const newRating = ((currentRating * currentReviews) + rating) / newReviews;
 
+    console.log(`Calculation: OldRating=${currentRating}, OldReviews=${currentReviews}, NewRating=${newRating}, NewReviews=${newReviews}`);
+
+    console.log("Step 4: Updating recipe document.");
     await updateDoc(recipeRef, {
         reviews: newReviews,
         rating: newRating,
     });
     console.log("Successfully updated recipe document.");
     
-    // Revalidate paths to show the new data immediately
     revalidatePath(`/recipe/${recipeId}`);
     revalidatePath('/');
 
@@ -71,6 +77,8 @@ export async function submitRating(formData: FormData) {
 
   } catch (e: any) {
     console.error("CRITICAL ERROR during rating submission: ", e);
+    // Log the full error object for better diagnostics
+    console.error(e);
     return {
         errors: { _form: [e.message || "An unexpected error occurred. Please check the logs."] }
     }
