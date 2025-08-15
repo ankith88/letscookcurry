@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowDown, ChefHat } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { FilteredRecipeGrid } from '@/components/recipes/filtered-recipe-grid';
 
 export default async function Home() {
   const weeklyRecipes = await getWeeklyRecipes();
@@ -70,7 +71,7 @@ export default async function Home() {
             Craving something different? Browse through our entire collection of authentic recipes.
           </p>
         </div>
-        <RecipeGrid recipes={allRecipes} cardType="view" />
+        <FilteredRecipeGrid recipes={allRecipes} />
       </div>
 
     </>
