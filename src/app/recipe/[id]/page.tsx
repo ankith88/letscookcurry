@@ -41,7 +41,7 @@ export default async function RecipePage({ params }: { params: { id: string } })
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <Badge variant="secondary" className="flex items-center gap-1 text-sm">
                   <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                  <span>{recipe.rating.toFixed(1)} ({recipe.reviews} reviews)</span>
+                  <span>{(recipe.rating || 0).toFixed(1)} ({recipe.reviews || 0} reviews)</span>
                 </Badge>
                 <Badge variant={recipe.diet === 'Veg' ? 'default' : 'destructive'} className="gap-1 text-sm bg-green-100 text-green-800 border-green-200 hover:bg-green-200">
                   <Leaf className="w-3 h-3"/>

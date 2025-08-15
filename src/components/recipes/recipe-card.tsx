@@ -38,7 +38,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
             <div className='flex flex-col items-end gap-2'>
               <Badge variant="secondary" className="flex items-center gap-1 shrink-0">
                   <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                  <span>{recipe.rating.toFixed(1)}</span>
+                  <span>{(recipe.rating || 0).toFixed(1)}</span>
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1 shrink-0">
                   <DollarSign className="w-4 h-4" />
