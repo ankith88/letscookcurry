@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Star, Soup, PlusCircle } from 'lucide-react';
+import { Star, Soup, PlusCircle, IndianRupee, MapPin, Leaf } from 'lucide-react';
 import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { RatingForm } from '@/components/recipes/rating-form';
 import { submitRating } from './actions';
@@ -33,19 +33,42 @@ export default async function RecipePage({ params }: { params: { id: string } })
               />
             </CardContent>
           </Card>
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Rate this Recipe</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RatingForm recipeId={recipe.id} submitRating={submitRating} />
+            </CardContent>
+          </Card>
         </div>
         <div className="lg:col-span-2">
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div>
-              <h1 className="text-4xl font-bold font-headline mb-2">{recipe.name}</h1>
-              <div className="flex items-center gap-4 mb-4">
+              <h1 className="text-4xl font-bold font-headline mb-4">{recipe.name}</h1>
+              <div className="flex flex-wrap items-center gap-2 mb-4">
                 <Badge variant="secondary" className="flex items-center gap-1 text-sm">
                   <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                   <span>{recipe.rating.toFixed(1)} ({recipe.reviews} reviews)</span>
                 </Badge>
+                <Badge variant={recipe.diet === 'Veg' ? 'default' : 'destructive'} className="gap-1 text-sm bg-green-100 text-green-800 border-green-200 hover:bg-green-200">
+                  <Leaf className="w-3 h-3"/>
+                  {recipe.diet}
+                </Badge>
+                <Badge variant="outline" className="gap-1 text-sm">
+                  <MapPin className="w-3 h-3"/>
+                  {recipe.region}
+                </Badge>
               </div>
               <p className="text-muted-foreground mb-6">{recipe.longDescription}</p>
 
+              <div className="flex items-center justify-between mb-6">
+                 <span className="text-3xl font-bold flex items-center gap-2">
+                    <IndianRupee className="w-6 h-6" />
+                    {recipe.price}
+                 </span>
+              </div>
+              
               <AddToCartButton recipe={recipe} />
             </div>
 
@@ -75,15 +98,6 @@ export default async function RecipePage({ params }: { params: { id: string } })
                 </div>
               </div>
             </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Rate this Recipe</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RatingForm recipeId={recipe.id} submitRating={submitRating} />
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

@@ -23,6 +23,9 @@ export const allRecipes: Recipe[] = [
       'Simmer the chicken in the sauce for 15 minutes.',
       'Garnish with fresh cilantro and serve hot with naan or rice.',
     ],
+    price: 15.99,
+    region: 'North',
+    diet: 'Non-Veg',
   },
   {
     id: 'lamb-rogan-josh',
@@ -42,6 +45,9 @@ export const allRecipes: Recipe[] = [
       'Add water, cover, and simmer until lamb is tender.',
       'Finish with a sprinkle of garam masala.',
     ],
+    price: 17.99,
+    region: 'North',
+    diet: 'Non-Veg',
   },
   {
     id: 'palak-paneer',
@@ -62,6 +68,9 @@ export const allRecipes: Recipe[] = [
       'Add paneer cubes and simmer for 5-7 minutes.',
       'Finish with a swirl of cream.',
     ],
+    price: 14.99,
+    region: 'North',
+    diet: 'Veg',
   },
   {
     id: 'chana-masala',
@@ -81,6 +90,9 @@ export const allRecipes: Recipe[] = [
       'Stir in cooked chickpeas and simmer for 20 minutes.',
       'Garnish with fresh cilantro and a squeeze of lemon.',
     ],
+    price: 12.99,
+    region: 'North',
+    diet: 'Veg',
   },
   {
     id: 'thai-green-curry',
@@ -101,6 +113,9 @@ export const allRecipes: Recipe[] = [
       'Add vegetables and season with fish sauce and sugar.',
       'Stir in Thai basil before serving.',
     ],
+    price: 16.99,
+    region: 'East',
+    diet: 'Non-Veg',
   },
   {
     id: 'beef-rendang',
@@ -121,6 +136,9 @@ export const allRecipes: Recipe[] = [
       'Continue cooking until the sauce is very thick and has been absorbed by the beef.',
       'Stir in toasted coconut before serving.',
     ],
+    price: 18.99,
+    region: 'East',
+    diet: 'Non-Veg',
   },
 ];
 
