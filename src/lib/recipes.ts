@@ -1,6 +1,6 @@
-import type { Recipe } from '@/lib/types';
+import type { Recipe, Rating } from '@/lib/types';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, doc, getDoc, query, where } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, query, where, orderBy } from "firebase/firestore";
 
 export async function getWeeklyRecipes(): Promise<Recipe[]> {
   const recipesCol = collection(db, 'recipes');
@@ -27,4 +27,12 @@ export async function getRecipeById(id: string): Promise<Recipe | null> {
     } else {
         return null;
     }
+}
+
+export async function getRecipeRatings(recipeId: string): Promise<Rating[]> {
+    const ratingsCol = collection(db, 'recipes', recipeId, 'ratings');
+    const q = query(ratingsCol, orderBy('createdAt', 'desc'));
+    const ratingSnapshot = await getDocs(q);
+    const ratingList = ratingSnapshot.docs.map(doc => doc.data() as Rating);
+    return ratingList;
 }

@@ -1,17 +1,19 @@
-import { getRecipeById } from '@/lib/recipes';
+import { getRecipeById, getRecipeRatings } from '@/lib/recipes';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Star, Soup, PlusCircle, DollarSign, MapPin, Leaf } from 'lucide-react';
+import { Star, Soup, PlusCircle, DollarSign, MapPin, Leaf, MessageSquare } from 'lucide-react';
 import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { RatingForm } from '@/components/recipes/rating-form';
 import { submitRating } from './actions';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default async function RecipePage({ params }: { params: { id: string } }) {
   const recipe = await getRecipeById(params.id);
+  const ratings = await getRecipeRatings(params.id);
 
   if (!recipe) {
     notFound();
@@ -32,6 +34,38 @@ export default async function RecipePage({ params }: { params: { id: string } })
                 data-ai-hint={recipe.imageHint}
               />
             </CardContent>
+          </Card>
+           <Card className="mt-8">
+              <CardHeader>
+              <CardTitle>What Others Are Saying</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                 {ratings.length > 0 ? (
+                    ratings.map((rating, index) => (
+                      <div key={index} className="flex gap-4">
+                        <Avatar>
+                           <AvatarFallback>{rating.rating}</AvatarFallback>
+                        </Avatar>
+                        <div className='flex-1'>
+                            <div className="flex items-center gap-2 mb-1">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={cn(
+                                    'w-4 h-4',
+                                    i < rating.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'
+                                  )}
+                                />
+                              ))}
+                           </div>
+                           <p className="text-sm text-muted-foreground">{rating.comment}</p>
+                        </div>
+                      </div>
+                    ))
+                 ) : (
+                  <p className="text-sm text-muted-foreground">No reviews yet. Be the first to share your thoughts!</p>
+                 )}
+              </CardContent>
           </Card>
         </div>
         <div className="lg:col-span-2">

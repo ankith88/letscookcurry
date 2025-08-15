@@ -55,6 +55,7 @@ export async function submitRating(formData: FormData) {
     });
 
     revalidatePath(`/recipe/${recipeId}`);
+    revalidatePath('/'); // Also revalidate home page in case the recipe is there
 
     return {
       message: "Thank you for your feedback!",

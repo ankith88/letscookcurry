@@ -21,3 +21,9 @@ export type Order = {
   items: Recipe[];
   total: number;
 };
+
+export type Rating = {
+  rating: number;
+  comment: string;
+  createdAt: any;
+}
