@@ -80,38 +80,6 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
               />
             </CardContent>
           </Card>
-           <Card className="mt-8">
-              <CardHeader>
-              <CardTitle>What Others Are Saying</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                 {ratings.length > 0 ? (
-                    ratings.map((rating, index) => (
-                      <div key={index} className="flex gap-4">
-                        <Avatar>
-                           <AvatarFallback>{rating.rating}</AvatarFallback>
-                        </Avatar>
-                        <div className='flex-1'>
-                            <div className="flex items-center gap-2 mb-1">
-                              {Array.from({ length: 5 }).map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={cn(
-                                    'w-4 h-4',
-                                    i < rating.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'
-                                  )}
-                                />
-                              ))}
-                           </div>
-                           {rating.comment && <p className="text-sm text-muted-foreground">{rating.comment}</p>}
-                        </div>
-                      </div>
-                    ))
-                 ) : (
-                  <p className="text-sm text-muted-foreground">No reviews yet. Be the first to share your thoughts!</p>
-                 )}
-              </CardContent>
-          </Card>
         </div>
         <div className="lg:col-span-2">
           <div className="space-y-6">
@@ -178,6 +146,38 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
                 <RatingForm recipeId={recipe.id} submitRating={handleRatingSubmit} />
                 </CardContent>
             </Card>
+             <Card className="mt-8">
+              <CardHeader>
+              <CardTitle>What Others Are Saying</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                 {ratings.length > 0 ? (
+                    ratings.map((rating, index) => (
+                      <div key={index} className="flex gap-4">
+                        <Avatar>
+                           <AvatarFallback>{rating.rating}</AvatarFallback>
+                        </Avatar>
+                        <div className='flex-1'>
+                            <div className="flex items-center gap-2 mb-1">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={cn(
+                                    'w-4 h-4',
+                                    i < rating.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'
+                                  )}
+                                />
+                              ))}
+                           </div>
+                           {rating.comment && <p className="text-sm text-muted-foreground">{rating.comment}</p>}
+                        </div>
+                      </div>
+                    ))
+                 ) : (
+                  <p className="text-sm text-muted-foreground">No reviews yet. Be the first to share your thoughts!</p>
+                 )}
+              </CardContent>
+          </Card>
           </div>
         </div>
       </div>
