@@ -1,7 +1,6 @@
 
 "use client";
 
-import { getRecipeById, getRecipeRatings } from '@/lib/recipes';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,39 +15,40 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import type { Recipe, Rating } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useRouter } from 'next/navigation';
 
-export default function RecipeClientPage({ recipeId }: { recipeId: string }) {
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [ratings, setRatings] = useState<Rating[]>([]);
-  const [loading, setLoading] = useState(true);
+interface RecipeClientPageProps {
+  initialRecipe: Recipe;
+  initialRatings: Rating[];
+}
+
+export default function RecipeClientPage({ initialRecipe, initialRatings }: RecipeClientPageProps) {
+  const router = useRouter();
+  const [recipe, setRecipe] = useState<Recipe>(initialRecipe);
+  const [ratings, setRatings] = useState<Rating[]>(initialRatings);
   const [orderableState, setOrderableState] = useState<'loading' | 'orderable' | 'closed'>('loading');
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const recipeData = await getRecipeById(recipeId);
-        
-        if (recipeData) {
-          const ratingsData = await getRecipeRatings(recipeId);
-          setRecipe(recipeData);
-          setRatings(ratingsData);
-        } else {
-            setRecipe(null); // Explicitly set to null if not found
-        }
-      } catch (error) {
-        console.error("Failed to fetch recipe data:", error);
-        setRecipe(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
+    setRecipe(initialRecipe);
+    setRatings(initialRatings);
+  }, [initialRecipe, initialRatings]);
 
+  useEffect(() => {
     const today = new Date().getDay();
+    // Monday to Thursday (1-4)
     setOrderableState(today >= 1 && today <= 4 ? 'orderable' : 'closed');
+  }, []);
+  
+  const handleRatingSubmit = async (formData: FormData) => {
+    const result = await submitRating(formData);
+    // After submitting, refresh the page to get the latest ratings and recipe info
+    // This is the modern Next.js way to handle data updates after mutations
+    if (result.message) {
+      router.refresh();
+    }
+    return result;
+  };
 
-  }, [recipeId]);
 
   const renderOrderButton = () => {
      if (!recipe?.isWeekly) return null;
@@ -66,47 +66,6 @@ export default function RecipeClientPage({ recipeId }: { recipeId: string }) {
                 </Button>
             );
      }
-  }
-
-
-  if (loading) {
-    return (
-       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-          <div className="lg:col-span-3">
-             <Card className="overflow-hidden">
-                <Skeleton className="w-full h-[600px]" />
-            </Card>
-          </div>
-          <div className="lg:col-span-2 space-y-6">
-            <Skeleton className="h-10 w-3/4" />
-            <div className="flex gap-2">
-                <Skeleton className="h-6 w-24" />
-                <Skeleton className="h-6 w-20" />
-                <Skeleton className="h-6 w-20" />
-            </div>
-            <Skeleton className="h-24 w-full" />
-             <Skeleton className="h-12 w-full" />
-             <Separator />
-              <div className="space-y-4">
-                <Skeleton className="h-8 w-1/2" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
-              </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (!recipe) {
-    return (
-        <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-2xl font-bold">Recipe not found</h1>
-            <p className="text-muted-foreground">The recipe you are looking for does not exist.</p>
-        </div>
-    )
   }
 
   return (
@@ -220,7 +179,7 @@ export default function RecipeClientPage({ recipeId }: { recipeId: string }) {
                 <CardTitle>Rate this Recipe</CardTitle>
                 </CardHeader>
                 <CardContent>
-                <RatingForm recipeId={recipe.id} submitRating={submitRating} />
+                <RatingForm recipeId={recipe.id} submitRating={handleRatingSubmit} />
                 </CardContent>
             </Card>
           </div>
