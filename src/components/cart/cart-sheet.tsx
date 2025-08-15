@@ -21,6 +21,8 @@ export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange:
   const { items, removeItem, clearCart } = useCart();
   const [isOrderable, setIsOrderable] = useState(false);
 
+  const totalPrice = items.reduce((total, item) => total + item.price, 0);
+
   useEffect(() => {
     // Day check is done on client to avoid hydration mismatch
     // 0 = Sunday, 1 = Monday, ..., 4 = Thursday
@@ -74,8 +76,13 @@ export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange:
               </div>
             </ScrollArea>
             <Separator />
-            <SheetFooter className="p-6">
+            <SheetFooter className="p-6 bg-muted/50 rounded-b-lg">
               <div className="flex w-full flex-col gap-4">
+                 <div className="flex justify-between text-lg font-semibold">
+                  <span>Total</span>
+                  <span>${totalPrice.toFixed(2)}</span>
+                </div>
+                <Separator />
                 {!isOrderable && (
                   <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800">
                     <AlertCircle className="h-4 w-4 !text-yellow-600 dark:!text-yellow-400" />
