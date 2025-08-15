@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { db } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, updateDoc, getDocs } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 const ratingSchema = z.object({
   recipeId: z.string().min(1, "Recipe ID is required."),
@@ -20,6 +21,7 @@ export async function submitRating(formData: FormData) {
   });
 
   if (!validatedFields.success) {
+    console.error("Validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
       errors: validatedFields.error.flatten().fieldErrors,
     };
@@ -52,17 +54,17 @@ export async function submitRating(formData: FormData) {
         rating: newRating,
     });
     
-    // Step 4: Revalidate paths to show updated data.
+    // Step 4: Revalidate paths to clear server-side cache.
     revalidatePath(`/recipe/${recipeId}`);
     revalidatePath('/');
 
-    return {
-      message: "Thank you for your feedback!",
-    };
-
   } catch (e: any) {
+    console.error("Error submitting rating:", e);
     return {
         errors: { _form: [e.message || "An unexpected error occurred."] }
     }
   }
+
+  // Step 5: Redirect to the same page to force a clean reload with new data.
+  redirect(`/recipe/${recipeId}`);
 }

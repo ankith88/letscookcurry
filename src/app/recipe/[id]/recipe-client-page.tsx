@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Star, DollarSign, MapPin, Leaf, Ban } from 'lucide-react';
+import { Star, DollarSign, MapPin, Leaf, Ban, Loader2 } from 'lucide-react';
 import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { RatingForm } from '@/components/recipes/rating-form';
 import { submitRating } from './actions';
@@ -15,41 +15,28 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import type { Recipe, Rating } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useRouter } from 'next/navigation';
 
 interface RecipeClientPageProps {
-  initialRecipe: Recipe;
+  initialRecipe: Recipe | null;
   initialRatings: Rating[];
 }
 
 export default function RecipeClientPage({ initialRecipe, initialRatings }: RecipeClientPageProps) {
-  const router = useRouter();
-  const [recipe, setRecipe] = useState<Recipe>(initialRecipe);
-  const [ratings, setRatings] = useState<Rating[]>(initialRatings);
+  const [recipe] = useState(initialRecipe);
+  const [ratings] = useState(initialRatings);
   const [orderableState, setOrderableState] = useState<'loading' | 'orderable' | 'closed'>('loading');
 
   useEffect(() => {
-    setRecipe(initialRecipe);
-    setRatings(initialRatings);
-  }, [initialRecipe, initialRatings]);
-
-  useEffect(() => {
+    // Day check is done on client to avoid hydration mismatch
     const today = new Date().getDay();
     // Monday to Thursday (1-4)
     setOrderableState(today >= 1 && today <= 4 ? 'orderable' : 'closed');
   }, []);
-  
+
   const handleRatingSubmit = async (formData: FormData) => {
-    const result = await submitRating(formData);
-    // After submitting, refresh the page to get the latest ratings and recipe info
-    // This is the modern Next.js way to handle data updates after mutations
-    if (result.message) {
-      router.refresh();
-    }
-    return result;
+    return await submitRating(formData);
   };
-
-
+  
   const renderOrderButton = () => {
      if (!recipe?.isWeekly) return null;
 
@@ -66,6 +53,15 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
                 </Button>
             );
      }
+  }
+  
+  if (!recipe) {
+    return (
+        <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-2xl font-bold">Recipe not found</h1>
+            <p className="text-muted-foreground">The recipe you are looking for does not exist.</p>
+        </div>
+    )
   }
 
   return (
@@ -107,7 +103,7 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
                                 />
                               ))}
                            </div>
-                           <p className="text-sm text-muted-foreground">{rating.comment}</p>
+                           {rating.comment && <p className="text-sm text-muted-foreground">{rating.comment}</p>}
                         </div>
                       </div>
                     ))

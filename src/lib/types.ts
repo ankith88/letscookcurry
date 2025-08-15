@@ -1,3 +1,4 @@
+
 export type Recipe = {
   id: string;
   name: string;
@@ -25,5 +26,6 @@ export type Order = {
 export type Rating = {
   rating: number;
   comment: string;
-  createdAt: any;
+  // This will be a string in ISO format on the client
+  createdAt: string; 
 }
