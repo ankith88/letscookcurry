@@ -3,9 +3,8 @@
 
 import { z } from 'zod';
 import { db } from '@/lib/firebase';
-import { collection, doc, getDoc, setDoc, updateDoc, getDocs } from 'firebase/firestore';
+import { collection, doc, setDoc, updateDoc, getDocs, Timestamp } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 const ratingSchema = z.object({
   recipeId: z.string().min(1, "Recipe ID is required."),
@@ -23,6 +22,7 @@ export async function submitRating(formData: FormData) {
   if (!validatedFields.success) {
     console.error("Validation failed:", validatedFields.error.flatten().fieldErrors);
     return {
+      success: false,
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
@@ -38,7 +38,7 @@ export async function submitRating(formData: FormData) {
     await setDoc(newRatingRef, {
         rating,
         comment: comment || "",
-        createdAt: new Date(),
+        createdAt: Timestamp.now(),
     });
 
     // Step 2: Recalculate the average rating and review count.
@@ -46,12 +46,12 @@ export async function submitRating(formData: FormData) {
     const allRatings = ratingsSnapshot.docs.map(doc => doc.data().rating as number);
     
     const newReviews = allRatings.length;
-    const newRating = newReviews > 0 ? allRatings.reduce((acc, curr) => acc + curr, 0) / newReviews : 0;
+    const newAverageRating = newReviews > 0 ? allRatings.reduce((acc, curr) => acc + curr, 0) / newReviews : 0;
 
     // Step 3: Update the main recipe document with the new values.
     await updateDoc(recipeRef, {
         reviews: newReviews,
-        rating: newRating,
+        rating: newAverageRating,
     });
     
     // Step 4: Revalidate paths to clear server-side cache.
@@ -61,10 +61,10 @@ export async function submitRating(formData: FormData) {
   } catch (e: any) {
     console.error("Error submitting rating:", e);
     return {
+        success: false,
         errors: { _form: [e.message || "An unexpected error occurred."] }
     }
   }
 
-  // Step 5: Redirect to the same page to force a clean reload with new data.
-  redirect(`/recipe/${recipeId}`);
+  return { success: true };
 }

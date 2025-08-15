@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useTransition } from 'react';
@@ -11,7 +12,7 @@ import { AlertCircle } from 'lucide-react';
 
 interface RatingFormProps {
   recipeId: string;
-  submitRating: (formData: FormData) => Promise<{ message?: string; errors?: any }>;
+  submitRating: (formData: FormData) => Promise<{ success?: boolean; errors?: any }>;
 }
 
 export function RatingForm({ recipeId, submitRating }: RatingFormProps) {
@@ -19,36 +20,40 @@ export function RatingForm({ recipeId, submitRating }: RatingFormProps) {
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isPending, startTransition] = useTransition();
-  const [formState, setFormState] = useState<{ message?: string; errors?: any } | null>(null);
+  const [formState, setFormState] = useState<{ success?: boolean; errors?: any } | null>(null);
   const { toast } = useToast();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (rating === 0) return;
+
     const formData = new FormData(event.currentTarget);
     formData.set('rating', rating.toString());
     
     startTransition(async () => {
       const result = await submitRating(formData);
       setFormState(result);
-      if (result.message) {
+      if (result.success) {
         toast({
             title: "Success!",
-            description: result.message,
+            description: "Your review has been submitted. The page will now reload.",
         });
-        setRating(0);
-        setComment('');
+        // Force a reload to show fresh data and avoid HMR issues.
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
       }
     });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-       {formState?.message && !formState.errors && (
-         <Alert variant="default" className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
-          <AlertCircle className="h-4 w-4 !text-green-600 dark:!text-green-400" />
-          <AlertTitle className="text-green-800 dark:text-green-200">Success</AlertTitle>
-          <AlertDescription className="text-green-700 dark:text-green-300">
-            {formState.message}
+       {formState?.errors && (
+         <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Submission Failed</AlertTitle>
+          <AlertDescription>
+            {formState.errors._form?.[0] || "Please check the form for errors."}
           </AlertDescription>
         </Alert>
        )}
@@ -78,7 +83,7 @@ export function RatingForm({ recipeId, submitRating }: RatingFormProps) {
       </div>
       <div>
         <label htmlFor="comment" className="block text-sm font-medium text-foreground mb-2">
-          Your Comment (optional)
+          Your Comment
         </label>
         <Textarea
           id="comment"
