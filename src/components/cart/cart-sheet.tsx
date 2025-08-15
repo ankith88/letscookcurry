@@ -63,7 +63,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean, onOpenChange:
                       />
                       <div>
                         <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-muted-foreground">{item.description}</p>
+                        <p className="text-sm text-muted-foreground">${item.price}</p>
                       </div>
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)}>
