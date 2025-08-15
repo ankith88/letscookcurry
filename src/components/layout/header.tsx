@@ -37,14 +37,14 @@ export function Header() {
           </Link>
         </nav>
         <div className="flex items-center justify-end space-x-2 sm:space-x-4">
-           <Button variant="ghost" size="icon" asChild>
+           <Button variant="ghost" size="icon" className="hover:bg-nav-hover hover:text-white rounded-full" asChild>
              <Link href="/login">
               <User className="h-5 w-5" />
               <span className="sr-only">Profile</span>
             </Link>
           </Button>
           <div className="relative">
-            <Button variant="ghost" size="icon" onClick={() => setIsCartOpen(true)}>
+            <Button variant="ghost" size="icon" className="hover:bg-nav-hover hover:text-white rounded-full" onClick={() => setIsCartOpen(true)}>
               <ShoppingCart className="h-5 w-5" />
               <span className="sr-only">Shopping Cart</span>
             </Button>
