@@ -58,7 +58,7 @@ export function Header() {
         </div>
 
         {/* Desktop Logo & Nav */}
-        <div className="mr-auto hidden items-center sm:flex">
+        <div className="mr-auto hidden items-center sm:flex sm:pl-4">
           <Link href="/" className="flex items-center space-x-2">
             <Image
               src="https://firebasestorage.googleapis.com/v0/b/lets-cook-curry-xrwg7.firebasestorage.app/o/letscookcurry-%20logo.png?alt=media&token=39f4c042-7108-4a35-8ce0-5ba1d2ab4314"
