@@ -1,20 +1,23 @@
 
-import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
+import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, ActionCodeSettings } from "firebase/auth";
 import { app } from './firebase'; // Make sure your firebase initialization is exported from here
 
 const auth = getAuth(app);
 
-const actionCodeSettings = {
-  // URL you want to redirect back to. The domain (www.example.com) must be authorized
-  // in the Firebase Console.
-  url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002'}/login`,
-  // This must be true.
-  handleCodeInApp: true,
+const getActionCodeSettings = (): ActionCodeSettings => {
+    return {
+        // URL you want to redirect back to. The domain must be authorized
+        // in the Firebase Console.
+        url: `${window.location.origin}/login`,
+        // This must be true.
+        handleCodeInApp: true,
+    };
 };
 
 
 export const doSendSignInLinkToEmail = async (email: string) => {
   try {
+    const actionCodeSettings = getActionCodeSettings();
     await sendSignInLinkToEmail(auth, email, actionCodeSettings);
     // The link was successfully sent. Inform the user.
     // Save the email locally so you don't need to ask the user for it again
