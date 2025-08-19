@@ -55,7 +55,7 @@ export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
   }, []);
 
   return (
-    <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+    <Card className="flex flex-col overflow-hidden transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1">
       <CardHeader className="p-0">
         <Link href={`/recipe/${recipe.id}`} className="block bg-muted/30">
           <Image
@@ -63,7 +63,7 @@ export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
             alt={recipe.name}
             width={600}
             height={400}
-            className="w-full h-auto object-cover aspect-[4/3]"
+            className="w-full h-auto object-cover"
             data-ai-hint={recipe.imageHint}
           />
         </Link>
