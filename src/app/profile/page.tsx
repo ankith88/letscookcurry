@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { History, LogOut, PlusCircle, User as UserIcon } from "lucide-react";
+import { History, LogOut, PlusCircle } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { Order } from "@/lib/types";
