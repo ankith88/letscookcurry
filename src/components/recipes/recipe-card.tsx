@@ -78,7 +78,7 @@ export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
                   <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                   <span>{(recipe.rating || 0).toFixed(1)}</span>
               </Badge>
-              {orderableState === 'orderable' && (
+              {recipe.isWeekly && orderableState === 'orderable' && (
                 <Badge variant="outline" className="flex items-center gap-1 shrink-0">
                     <DollarSign className="w-4 h-4" />
                     <span>{recipe.price}</span>
