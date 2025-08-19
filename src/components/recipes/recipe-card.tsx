@@ -46,6 +46,13 @@ function CartButton({ recipe }: { recipe: Recipe }) {
 
 
 export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
+  const [orderableState, setOrderableState] = useState<'loading' | 'orderable' | 'closed'>('loading');
+
+  useEffect(() => {
+    const today = new Date().getDay();
+    // Monday to Thursday (1-4)
+    setOrderableState(today >= 1 && today <= 4 ? 'orderable' : 'closed');
+  }, []);
 
   return (
     <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
@@ -71,10 +78,12 @@ export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
                   <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                   <span>{(recipe.rating || 0).toFixed(1)}</span>
               </Badge>
-              <Badge variant="outline" className="flex items-center gap-1 shrink-0">
-                  <DollarSign className="w-4 h-4" />
-                  <span>{recipe.price}</span>
-              </Badge>
+              {orderableState === 'orderable' && (
+                <Badge variant="outline" className="flex items-center gap-1 shrink-0">
+                    <DollarSign className="w-4 h-4" />
+                    <span>{recipe.price}</span>
+                </Badge>
+              )}
             </div>
         </div>
         <p className="text-muted-foreground text-sm mb-4">{recipe.description}</p>

@@ -96,12 +96,14 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
               </div>
               <p className="text-muted-foreground mb-6">{recipe.longDescription}</p>
 
-              <div className="flex items-center justify-between mb-6">
-                 <span className="text-3xl font-bold flex items-center gap-2">
-                    <DollarSign className="w-6 h-6" />
-                    {recipe.price}
-                 </span>
-              </div>
+              {orderableState === 'orderable' && (
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-3xl font-bold flex items-center gap-2">
+                      <DollarSign className="w-6 h-6" />
+                      {recipe.price}
+                  </span>
+                </div>
+              )}
               
               {renderOrderButton()}
 
