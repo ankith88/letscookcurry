@@ -29,10 +29,10 @@ export default async function Home() {
           <div className="absolute inset-0 bg-black/40" />
         </div>
         <div className="relative z-10 p-4 max-w-3xl animate-in fade-in duration-1000">
-          <h1 className="text-4xl font-bold font-headline tracking-tight text-white sm:text-5xl lg:text-7xl !leading-tight drop-shadow-xl">
+          <h1 className="text-4xl font-bold font-headline tracking-tight text-white sm:text-5xl lg:text-7xl !leading-tight drop-shadow-2xl">
             From Our Kitchen to Yours
           </h1>
-          <p className="mt-6 max-w-2xl mx-auto text-lg text-white/90 drop-shadow-md">
+          <p className="mt-6 max-w-2xl mx-auto text-lg text-white/90 drop-shadow-lg">
             Create unforgettable meals and lasting memories, one curry at a time. New choices to order every single Monday to spice up your week!
           </p>
           <div className="mt-10">
