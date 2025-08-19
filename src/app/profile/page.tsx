@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useCart } from "@/hooks/use-cart";
@@ -5,16 +6,39 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { History, PlusCircle, UserCircle } from "lucide-react";
+import { History, LogOut, PlusCircle, User, UserCircle } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { Order } from "@/lib/types";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { app } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
+const auth = getAuth(app);
 
 export default function ProfilePage() {
     const { addItem } = useCart();
     const { toast } = useToast();
+    const router = useRouter();
     const [orderHistory, setOrderHistory] = useState<Order[]>([]);
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+            } else {
+                // If no user is signed in, redirect to login page.
+                router.push('/login');
+            }
+            setLoading(false);
+        });
+
+        // Cleanup subscription on unmount
+        return () => unsubscribe();
+    }, [router]);
 
     // In a real app, this would fetch from a database.
     // We'll keep it client-side for now.
@@ -31,6 +55,55 @@ export default function ProfilePage() {
         })
     }
 
+    const handleSignOut = async () => {
+        await auth.signOut();
+        toast({
+            title: "Signed Out",
+            description: "You have been successfully signed out.",
+        });
+        router.push('/');
+    }
+
+    if (loading) {
+        return (
+             <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+                <div className="space-y-12">
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center gap-4">
+                                <Skeleton className="h-12 w-12 rounded-full" />
+                                <div className="space-y-2">
+                                    <Skeleton className="h-6 w-48" />
+                                    <Skeleton className="h-4 w-64" />
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                             <Skeleton className="h-10 w-28" />
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center gap-3">
+                                <History className="h-6 w-6 text-primary"/>
+                                <CardTitle className="text-2xl font-headline">Order History</CardTitle>
+                            </div>
+                             <CardDescription>Review your past orders and quickly reorder your favorites.</CardDescription>
+                        </CardHeader>
+                         <CardContent>
+                            <p className="text-muted-foreground">You have no past orders.</p>
+                         </CardContent>
+                    </Card>
+                </div>
+            </div>
+        )
+    }
+    
+    if (!user) {
+        // This is a fallback, but the onAuthStateChanged should have already redirected.
+        return null; 
+    }
+
     return (
         <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
             <div className="space-y-12">
@@ -39,13 +112,17 @@ export default function ProfilePage() {
                         <div className="flex items-center gap-4">
                             <UserCircle className="h-12 w-12 text-muted-foreground"/>
                             <div>
-                                <CardTitle className="text-2xl font-headline">Jane Doe</CardTitle>
-                                <CardDescription>jane.doe@example.com</CardDescription>
+                                <CardTitle className="text-2xl font-headline">{user.displayName || "Valued Customer"}</CardTitle>
+                                <CardDescription>{user.email}</CardDescription>
                             </div>
                         </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex gap-2">
                         <Button variant="outline">Edit Profile</Button>
+                        <Button variant="destructive" onClick={handleSignOut}>
+                            <LogOut className="mr-2 h-4 w-4"/>
+                            Sign Out
+                        </Button>
                     </CardContent>
                 </Card>
 
