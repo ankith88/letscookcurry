@@ -26,10 +26,10 @@ export default async function Home() {
             priority
             data-ai-hint="indian food background"
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/40" />
         </div>
-        <div className="relative z-10 p-4 max-w-3xl">
-          <h1 className="text-4xl font-bold font-headline tracking-tight text-white sm:text-5xl lg:text-7xl !leading-tight drop-shadow-lg">
+        <div className="relative z-10 p-4 max-w-3xl animate-in fade-in duration-1000">
+          <h1 className="text-4xl font-bold font-headline tracking-tight text-white sm:text-5xl lg:text-7xl !leading-tight drop-shadow-xl">
             From Our Kitchen to Yours
           </h1>
           <p className="mt-6 max-w-2xl mx-auto text-lg text-white/90 drop-shadow-md">
@@ -39,7 +39,7 @@ export default async function Home() {
             <Button asChild size="lg">
               <Link href={hasWeeklyRecipes ? "#recipes" : "#all-recipes"}>
                 {hasWeeklyRecipes ? "Explore This Week's Recipes" : "Explore All Recipes"}
-                <ArrowDown className="ml-2 h-5 w-5 animate-bounce" />
+                <ArrowDown className="ml-2 h-5 w-5 animate-pulse" />
               </Link>
             </Button>
           </div>
