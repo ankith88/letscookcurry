@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -11,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Map, Leaf } from 'lucide-react';
+import { Search, Map, Leaf, Flame } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface FilteredRecipeGridProps {
@@ -22,20 +23,22 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [region, setRegion] = useState('all');
   const [diet, setDiet] = useState('all');
+  const [spice, setSpice] = useState('all');
 
   const filteredRecipes = useMemo(() => {
     return recipes.filter((recipe) => {
       const nameMatch = recipe.name.toLowerCase().includes(searchTerm.toLowerCase());
       const regionMatch = region === 'all' || recipe.region === region;
       const dietMatch = diet === 'all' || recipe.diet === diet;
-      return nameMatch && regionMatch && dietMatch;
+      const spiceMatch = spice === 'all' || recipe.spice === spice;
+      return nameMatch && regionMatch && dietMatch && spiceMatch;
     });
-  }, [recipes, searchTerm, region, diet]);
+  }, [recipes, searchTerm, region, diet, spice]);
 
   return (
     <div>
         <Card className="mb-12 bg-muted/50 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -75,6 +78,23 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
                             <SelectItem value="all">All Diets</SelectItem>
                             <SelectItem value="Veg">Veg</SelectItem>
                             <SelectItem value="Non-Veg">Non-Veg</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                 <div>
+                    <Select value={spice} onValueChange={setSpice}>
+                         <SelectTrigger>
+                            <div className="flex items-center gap-2">
+                                <Flame className="h-4 w-4 text-muted-foreground" />
+                                <SelectValue placeholder="Filter by spice level" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Spice Levels</SelectItem>
+                            <SelectItem value="mild">Mild</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="hot">Hot</SelectItem>
+                            <SelectItem value="very-hot">Very Hot</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
