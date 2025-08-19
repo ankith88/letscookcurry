@@ -9,12 +9,14 @@ const firebaseConfig = {
   "storageBucket": "lets-cook-curry-xrwg7.firebasestorage.app",
   "apiKey": "AIzaSyDvTQfSl1TdPi38Qdx_l4yyrSK8SJiylnM",
   "authDomain": "lets-cook-curry-xrwg7.firebaseapp.com",
-  "measurementId": "",
+  "measurementId": "G-4191LS4T0V",
   "messagingSenderId": "480933950760"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+export const GTM_ID = firebaseConfig.measurementId;
 
 export { app, db };

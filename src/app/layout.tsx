@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/layout/header';
 import { CartProvider } from '@/context/cart-context';
 import { Toaster } from '@/components/ui/toaster';
+import { Analytics } from '@/components/analytics';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: "Let's Cook Curry",
@@ -36,6 +38,9 @@ export default function RootLayout({
           </div>
           <Toaster />
         </CartProvider>
+        <Suspense fallback={null}>
+            <Analytics />
+        </Suspense>
       </body>
     </html>
   );

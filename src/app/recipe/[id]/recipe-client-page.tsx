@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import type { Recipe, Rating } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { event } from '@/lib/gtag';
 
 interface RecipeClientPageProps {
   initialRecipe: Recipe;
@@ -30,7 +31,17 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
     const today = new Date().getDay();
     // Monday to Thursday (1-4)
     setOrderableState(today >= 1 && today <= 4 ? 'orderable' : 'closed');
-  }, []);
+
+    if (recipe) {
+      event({
+        action: 'view_recipe',
+        category: 'engagement',
+        label: recipe.name,
+        value: 1
+      });
+    }
+
+  }, [recipe]);
   
   const renderOrderButton = () => {
      if (!recipe?.isWeekly) return null;
