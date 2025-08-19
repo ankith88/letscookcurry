@@ -1,7 +1,7 @@
 import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
-import { db } from './firebase'; // Make sure your firebase initialization is exported from here
+import { app } from './firebase'; // Make sure your firebase initialization is exported from here
 
-const auth = getAuth();
+const auth = getAuth(app);
 
 export const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
@@ -26,5 +26,3 @@ export const signInWithApple = async () => {
     throw error;
   }
 };
-
-    
