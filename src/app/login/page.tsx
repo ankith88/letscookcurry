@@ -1,9 +1,14 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Apple, KeyRound, Mail } from 'lucide-react';
+import { signInWithGoogle, signInWithApple } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const GoogleIcon = () => (
     <svg className="w-4 h-4" viewBox="0 0 48 48">
@@ -15,6 +20,24 @@ const GoogleIcon = () => (
   );
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleSocialLogin = async (provider: 'google' | 'apple') => {
+    try {
+      const action = provider === 'google' ? signInWithGoogle : signInWithApple;
+      await action();
+      router.push('/profile');
+    } catch (error: any) {
+      console.error("Authentication Error:", error);
+      toast({
+        title: "Authentication Failed",
+        description: error.message || "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-background p-4">
       <Card className="w-full max-w-md mx-auto">
@@ -49,8 +72,8 @@ export default function LoginPage() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline"><GoogleIcon /> <span className="ml-2">Google</span></Button>
-            <Button variant="outline"><Apple className="mr-2 h-4 w-4" /> Apple</Button>
+            <Button variant="outline" onClick={() => handleSocialLogin('google')}><GoogleIcon /> <span className="ml-2">Google</span></Button>
+            <Button variant="outline" onClick={() => handleSocialLogin('apple')}><Apple className="mr-2 h-4 w-4" /> Apple</Button>
           </div>
           <div className="mt-6 text-center text-sm">
             Don't have an account?{" "}
@@ -63,3 +86,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
