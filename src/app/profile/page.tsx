@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { History, LogOut, PlusCircle, User, UserCircle } from "lucide-react";
+import { History, LogOut, PlusCircle, User as UserIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { Order } from "@/lib/types";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { app } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -110,7 +110,6 @@ export default function ProfilePage() {
                 <Card>
                     <CardHeader>
                         <div className="flex items-center gap-4">
-                            <UserCircle className="h-12 w-12 text-muted-foreground"/>
                             <div>
                                 <CardTitle className="text-2xl font-headline">{user.displayName || "Valued Customer"}</CardTitle>
                                 <CardDescription>{user.email}</CardDescription>
