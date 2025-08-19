@@ -36,24 +36,29 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
-        <div className="mr-auto flex items-center">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        {/* Mobile Menu */}
+        <div className="flex items-center sm:hidden">
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button
+                <Button
                 variant="ghost"
                 size="icon"
-                className="mr-2 sm:hidden hover:bg-nav-hover hover:text-white rounded-full"
-              >
+                className="hover:bg-nav-hover hover:text-white rounded-full"
+                >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle Menu</span>
-              </Button>
+                </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px]">
                 <nav className="flex flex-col gap-4 mt-8 text-lg font-medium">
-                  <NavLinks />
+                    <NavLinks />
                 </nav>
             </SheetContent>
-          </Sheet>
+            </Sheet>
+        </div>
+
+        {/* Desktop Logo & Nav */}
+        <div className="mr-auto hidden items-center sm:flex">
           <Link href="/" className="flex items-center space-x-2">
             <Image
               src="https://firebasestorage.googleapis.com/v0/b/lets-cook-curry-xrwg7.firebasestorage.app/o/letscookcurry-%20logo.png?alt=media&token=39f4c042-7108-4a35-8ce0-5ba1d2ab4314"
@@ -71,7 +76,22 @@ export function Header() {
           <NavLinks />
         </nav>
 
-        <div className="flex items-center justify-end space-x-2 sm:space-x-4 ml-auto">
+        {/* Centered Mobile Logo */}
+        <div className="flex-1 flex justify-center sm:hidden">
+            <Link href="/" className="flex items-center space-x-2">
+                <Image
+                src="https://firebasestorage.googleapis.com/v0/b/lets-cook-curry-xrwg7.firebasestorage.app/o/letscookcurry-%20logo.png?alt=media&token=39f4c042-7108-4a35-8ce0-5ba1d2ab4314"
+                alt="Let's Cook Curry Logo"
+                width={40}
+                height={40}
+                className="rounded-full"
+                data-ai-hint="logo curry"
+                />
+            </Link>
+        </div>
+
+
+        <div className="flex items-center justify-end space-x-2 sm:space-x-4">
            <Button variant="ghost" size="icon" className="hover:bg-nav-hover hover:text-white rounded-full" asChild>
              <Link href="/login">
               <User className="h-5 w-5" />
