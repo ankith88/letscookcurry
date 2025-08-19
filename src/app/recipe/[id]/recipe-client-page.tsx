@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import type { Recipe, Rating } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { event } from '@/lib/gtag';
+import { SpiceLevel } from '@/components/recipes/spice-level';
 
 interface RecipeClientPageProps {
   initialRecipe: Recipe;
@@ -104,6 +105,7 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
                   <MapPin className="w-3 h-3"/>
                   {recipe.region}
                 </Badge>
+                {recipe.spice && <SpiceLevel spice={recipe.spice} />}
               </div>
               <p className="text-muted-foreground mb-6">{recipe.longDescription}</p>
 

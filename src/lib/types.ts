@@ -14,6 +14,7 @@ export type Recipe = {
   region: "South" | "North" | "West" | "East";
   diet: "Non-Veg" | "Veg";
   isWeekly?: boolean;
+  spice: "mild" | "medium" | "hot" | "very-hot";
 };
 
 export type Order = {

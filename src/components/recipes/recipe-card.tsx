@@ -11,6 +11,7 @@ import { Star, PlusCircle, DollarSign, MapPin, Leaf, Eye, Ban } from 'lucide-rea
 import { useCart } from '@/hooks/use-cart';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '../ui/skeleton';
+import { SpiceLevel } from './spice-level';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -87,7 +88,7 @@ export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
             </div>
         </div>
         <p className="text-muted-foreground text-sm mb-4">{recipe.description}</p>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
            <Badge variant={recipe.diet === 'Veg' ? 'default' : 'destructive'} className="gap-1 bg-green-100 text-green-800 border-green-200 hover:bg-green-200">
              <Leaf className="w-3 h-3"/>
              {recipe.diet}
@@ -96,6 +97,7 @@ export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
                 <MapPin className="w-3 h-3"/>
                 {recipe.region}
             </Badge>
+            {recipe.spice && <SpiceLevel spice={recipe.spice} />}
         </div>
 
       </CardContent>
