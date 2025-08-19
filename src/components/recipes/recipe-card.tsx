@@ -63,7 +63,7 @@ export function RecipeCard({ recipe, cardType }: RecipeCardProps) {
             alt={recipe.name}
             width={600}
             height={400}
-            className="w-full h-48 object-contain"
+            className="w-full h-auto object-cover aspect-[4/3]"
             data-ai-hint={recipe.imageHint}
           />
         </Link>
