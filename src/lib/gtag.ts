@@ -1,3 +1,4 @@
+
 import { GTM_ID } from './firebase';
 
 type GTagEvent = {
