@@ -9,7 +9,7 @@ const firebaseConfig = {
   "storageBucket": "lets-cook-curry-xrwg7.firebasestorage.app",
   "apiKey": "AIzaSyDvTQfSl1TdPi38Qdx_l4yyrSK8SJiylnM",
   "authDomain": "lets-cook-curry-xrwg7.firebaseapp.com",
-  "measurementId": "G-4191LS4T0V",
+  "measurementId": "G-XZ5L0Q50Z2",
   "messagingSenderId": "480933950760"
 };
 

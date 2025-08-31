@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/layout/header';
 import { CartProvider } from '@/context/cart-context';
 import { Toaster } from '@/components/ui/toaster';
-import { Analytics } from '@/components/analytics';
-import { Suspense } from 'react';
+import Script from 'next/script';
+import { GTM_ID } from '@/lib/firebase';
 
 export const metadata: Metadata = {
   title: "Let's Cook Curry",
@@ -25,6 +25,25 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+        {/* Google tag (gtag.js) */}
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GTM_ID}`}
+        />
+        <Script
+          id="gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GTM_ID}', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
       </head>
       <body
         className={cn(
@@ -38,9 +57,6 @@ export default function RootLayout({
           </div>
           <Toaster />
         </CartProvider>
-        <Suspense fallback={null}>
-            <Analytics />
-        </Suspense>
       </body>
     </html>
   );
