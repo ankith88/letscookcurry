@@ -4,14 +4,15 @@ import RecipeClientPage from './recipe-client-page';
 import { notFound } from 'next/navigation';
 import type { Rating } from '@/lib/types';
 
-export default async function RecipePage({ params }: { params: { id: string } }) {
-  let recipe = await getRecipeById(params.id);
+export default async function RecipePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  let recipe = await getRecipeById(id);
   
   if (!recipe) {
     notFound();
   }
   
-  const ratings = await getRecipeRatings(params.id);
+  const ratings = await getRecipeRatings(id);
 
   // Dynamically calculate rating and reviews count on the server
   if (ratings.length > 0) {

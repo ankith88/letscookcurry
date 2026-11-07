@@ -2,19 +2,30 @@
 "use client";
 
 import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Star } from 'lucide-react';
+import { Star, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { AlertCircle } from 'lucide-react';
+import type { Rating } from '@/lib/types';
 
 interface RatingFormProps {
   recipeId: string;
+  onReviewSubmitted?: (newRating: Rating) => void;
 }
 
-export function RatingForm({ recipeId }: RatingFormProps) {
+const RATING_LABELS: Record<number, string> = {
+  1: '1 Star — Needs Improvement',
+  2: '2 Stars — Fair',
+  3: '3 Stars — Good',
+  4: '4 Stars — Very Delicious',
+  5: '5 Stars — Absolutely Amazing!',
+};
+
+export function RatingForm({ recipeId, onReviewSubmitted }: RatingFormProps) {
+  const router = useRouter();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -22,107 +33,141 @@ export function RatingForm({ recipeId }: RatingFormProps) {
   const [formState, setFormState] = useState<{ success?: boolean; errors?: any } | null>(null);
   const { toast } = useToast();
 
+  const activeRating = hoverRating || rating;
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (rating === 0) {
-        setFormState({ errors: { rating: ["Please select a rating."] }});
-        return;
-    };
+      setFormState({ errors: { rating: ["Please select a star rating."] } });
+      return;
+    }
 
     setFormState(null);
 
     const formData = {
-        recipeId,
-        rating,
-        comment,
+      recipeId,
+      rating,
+      comment,
     };
-    
+
     startTransition(async () => {
-        try {
-            const response = await fetch('/api/ratings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+      try {
+        const response = await fetch('/api/ratings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
 
-            const result = await response.json();
+        const result = await response.json();
 
-            if (!response.ok) {
-                 setFormState(result || { success: false, errors: { _form: ["An unknown error occurred."] } });
-                 return;
-            }
-            
-            if (result.success) {
-                toast({
-                    title: "Success!",
-                    description: "Your review has been submitted. The page will now reload.",
-                });
-                // Force a reload to show fresh data and avoid HMR issues.
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            } else {
-                 setFormState(result);
-            }
-        } catch (error) {
-             setFormState({ success: false, errors: { _form: ["An unexpected network error occurred."] } });
+        if (!response.ok) {
+          setFormState(result || { success: false, errors: { _form: ["An unknown error occurred."] } });
+          return;
         }
+
+        if (result.success) {
+          toast({
+            title: "Thank you for your review!",
+            description: "Your rating and feedback have been shared.",
+          });
+          onReviewSubmitted?.({
+            rating,
+            comment,
+            createdAt: new Date().toISOString(),
+          });
+          setRating(0);
+          setHoverRating(0);
+          setComment('');
+          router.refresh();
+        } else {
+          setFormState(result);
+        }
+      } catch (error) {
+        setFormState({ success: false, errors: { _form: ["An unexpected network error occurred."] } });
+      }
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-       {formState?.errors && (
-         <Alert variant="destructive">
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {formState?.errors?._form && (
+        <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Submission Failed</AlertTitle>
           <AlertDescription>
             {formState.errors._form?.[0] || "Please check the form for errors."}
           </AlertDescription>
         </Alert>
-       )}
+      )}
 
       <div>
-        <label className="block text-sm font-medium text-foreground mb-2">Your Rating</label>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center justify-between mb-2">
+          <span id="rating-group-label" className="block text-sm font-medium text-foreground">
+            Your Rating <span className="text-destructive">*</span>
+          </span>
+          {activeRating > 0 && (
+            <span className="text-xs font-medium text-primary" aria-live="polite">
+              {RATING_LABELS[activeRating]}
+            </span>
+          )}
+        </div>
+        <div
+          role="group"
+          aria-labelledby="rating-group-label"
+          className="flex items-center gap-1.5"
+        >
           {[1, 2, 3, 4, 5].map((star) => (
-            <Star
+            <button
               key={star}
-              className={cn(
-                'w-8 h-8 cursor-pointer transition-colors',
-                (hoverRating || rating) >= star
-                  ? 'text-amber-500 fill-amber-500'
-                  : 'text-gray-300'
-              )}
+              type="button"
+              aria-label={`Rate ${star} out of 5 stars`}
+              aria-pressed={rating === star}
               onClick={() => setRating(star)}
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
-            />
+              className="rounded-md p-1 transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <Star
+                aria-hidden="true"
+                className={cn(
+                  'w-7 h-7 transition-colors',
+                  activeRating >= star
+                    ? 'text-amber-500 fill-amber-500'
+                    : 'text-muted-foreground/30'
+                )}
+              />
+            </button>
           ))}
         </div>
         {formState?.errors?.rating && (
-            <p className="text-sm text-destructive mt-1">{formState.errors.rating[0]}</p>
+          <p className="text-sm text-destructive mt-1.5" role="alert">
+            {formState.errors.rating[0]}
+          </p>
         )}
       </div>
+
       <div>
         <label htmlFor="comment" className="block text-sm font-medium text-foreground mb-2">
-          Your Comment
+          Your Comment <span className="text-muted-foreground font-normal">(optional)</span>
         </label>
         <Textarea
           id="comment"
           name="comment"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="What did you think of this recipe?"
+          placeholder="How did your curry turn out? Share tips or thoughts..."
           rows={4}
         />
         {formState?.errors?.comment && (
-            <p className="text-sm text-destructive mt-1">{formState.errors.comment[0]}</p>
+          <p className="text-sm text-destructive mt-1.5" role="alert">
+            {formState.errors.comment[0]}
+          </p>
         )}
       </div>
-      <Button type="submit" disabled={isPending || rating === 0}>
+
+      <Button type="submit" className="w-full sm:w-auto font-semibold" disabled={isPending || rating === 0}>
         {isPending ? 'Submitting...' : 'Submit Review'}
       </Button>
     </form>

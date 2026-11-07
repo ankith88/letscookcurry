@@ -2,32 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
-  font-family: 'Lato', sans-serif;
+  font-family: var(--font-body), 'Lato', sans-serif;
 }
 
 @layer base {
   :root {
     --background: 39 77% 96%;
-    --foreground: 24 10% 20%;
+    --foreground: 24 20% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 24 10% 20%;
+    --card-foreground: 24 20% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 24 10% 20%;
-    --primary: 38 98% 53%;
-    --primary-foreground: 24 10% 10%;
-    --secondary: 38 30% 85%;
-    --secondary-foreground: 24 10% 20%;
-    --muted: 38 30% 90%;
-    --muted-foreground: 24 5% 45%;
-    --accent: 40 98% 68%;
-    --accent-foreground: 24 10% 10%;
-    --destructive: 0 84.2% 60.2%;
+    --popover-foreground: 24 20% 15%;
+    --primary: 35 92% 59%;
+    --primary-foreground: 24 20% 10%;
+    --secondary: 38 35% 88%;
+    --secondary-foreground: 24 20% 16%;
+    --muted: 38 30% 91%;
+    --muted-foreground: 24 12% 36%;
+    --accent: 35 92% 59%;
+    --accent-foreground: 24 20% 10%;
+    --destructive: 0 78% 48%;
     --destructive-foreground: 0 0% 98%;
-    --border: 38 20% 80%;
-    --input: 38 20% 88%;
-    --ring: 38 98% 53%;
-    --radius: 0.5rem;
+    --border: 35 24% 82%;
+    --input: 35 24% 82%;
+    --ring: 35 92% 59%;
+    --radius: 0.75rem;
     --nav-hover: 88 38% 28%;
   }
 
@@ -38,12 +48,12 @@ body {
     --card-foreground: 78 20% 94%;
     --popover: 78 36% 12%;
     --popover-foreground: 78 20% 94%;
-    --primary: 38 98% 53%;
+    --primary: 35 92% 59%;
     --primary-foreground: 24 10% 10%;
     --secondary: 78 36% 25%;
     --secondary-foreground: 78 20% 94%;
     --muted: 78 36% 20%;
-    --muted-foreground: 78 15% 65%;
+    --muted-foreground: 78 15% 70%;
     --accent: 40 98% 68%;
     --accent-foreground: 24 10% 10%;
     --destructive: 0 62.8% 30.6%;

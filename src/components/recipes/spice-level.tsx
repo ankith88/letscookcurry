@@ -24,18 +24,22 @@ export function SpiceLevel({ spice }: SpiceLevelProps) {
   const totalIcons = 4;
 
   return (
-    <Badge variant="outline" className="gap-1.5 capitalize">
-        <div className="flex items-center gap-0.5">
-            {Array.from({ length: totalIcons }).map((_, index) => (
-                <Flame
-                key={index}
-                className={cn(
-                    'w-3.5 h-3.5',
-                    index < config.level ? config.color : 'text-gray-300'
-                )}
-                />
-            ))}
-        </div>
+    <Badge
+      variant="outline"
+      className="gap-1.5 capitalize"
+      aria-label={`Spice level: ${config.label}`}
+    >
+      <div className="flex items-center gap-0.5" aria-hidden="true">
+        {Array.from({ length: totalIcons }).map((_, index) => (
+          <Flame
+            key={index}
+            className={cn(
+              'w-3.5 h-3.5',
+              index < config.level ? config.color : 'text-muted-foreground/30'
+            )}
+          />
+        ))}
+      </div>
       {config.label}
     </Badge>
   );

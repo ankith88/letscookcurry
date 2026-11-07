@@ -17,10 +17,14 @@ export type Recipe = {
   spice: "mild" | "medium" | "hot" | "very-hot";
 };
 
+export type CartItem = Recipe & {
+  quantity: number;
+};
+
 export type Order = {
   id: string;
   date: string;
-  items: Recipe[];
+  items: CartItem[];
   total: number;
 };
 

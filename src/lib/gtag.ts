@@ -1,6 +1,8 @@
 
 import { GTM_ID } from './firebase';
 
+export { GTM_ID };
+
 type GTagEvent = {
   action: string;
   category: string;
