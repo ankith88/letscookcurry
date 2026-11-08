@@ -1,0 +1,209 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// This security rules file assumes the following data structures:
+//
+// Collection: settings
+// Document ID: {settingId} (specifically 'site')
+// Fields:
+//   - orderingFeatureEnabled: bool (optional/validated when present) - Whether ordering UI/features are active
+//   - orderWindowMode: string (optional/validated when present, enum: ['auto', 'open', 'closed']) - Order schedule mode
+//   - adminEmails: list<string> (optional/validated when present, max 50 items) - Authorized admin email addresses
+//   - updatedAt: string | timestamp (optional, max 100 chars) - Last update timestamp
+//   - updatedBy: string (optional, max 320 chars) - Email of admin who updated settings
+//
+// Collection: recipes
+// Document ID: {recipeId}
+// Fields:
+//   - id: string (optional, max 200 chars) - Recipe identifier
+//   - name: string (optional on legacy partial update, 1..200 chars) - Dish title
+//   - description: string (optional on legacy partial update, 1..1000 chars) - Short summary
+//   - longDescription: string (optional, max 5000 chars) - Detailed recipe story
+//   - imageUrl: string (optional on legacy partial update, max 2048 chars) - Recipe photo URL
+//   - imageHint: string (optional, max 200 chars) - AI image search hint
+//   - rating: number (optional, 0..5) - Aggregate star rating
+//   - reviews: number (optional, >= 0) - Aggregate review count
+//   - ingredients: list<string> (optional on legacy partial update, max 100 items) - Ingredient lines
+//   - instructions: list<string> (optional on legacy partial update, max 100 items) - Cooking steps
+//   - price: number (optional on legacy partial update, 0..10000) - Dish price in AUD
+//   - region: string (optional on legacy partial update, enum: ['South', 'North', 'West', 'East'])
+//   - diet: string (optional on legacy partial update, enum: ['Non-Veg', 'Veg'])
+//   - spice: string (optional on legacy partial update, enum: ['mild', 'medium', 'hot', 'very-hot'])
+//   - isWeekly: bool (optional) - Featured on current weekly menu
+//
+// Subcollection: recipes/{recipeId}/ratings
+// Document ID: {ratingId}
+// Fields:
+//   - rating: number (required, 1..5) - Star rating submitted by visitor
+//   - comment: string (optional, max 500 chars) - Review comment text
+//   - createdAt: timestamp | string (optional, immutable on update) - Submission timestamp
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user owns the resource (for user-owned documents)
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Verify UID hasn't been tampered with on create
+    function uidUnchanged() {
+      return !('uid' in request.resource.data) ||
+        request.resource.data.uid == request.auth.uid;
+    }
+
+    // Ensure uid field is not modified on update
+    function uidNotModified() {
+      return !('uid' in request.resource.data) ||
+        request.resource.data.uid == resource.data.uid;
+    }
+
+    // Validate required fields exist
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // Validate that the document contains only the allowed fields
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // Validate optional string (if present, must be string and within length)
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+        request.resource.data[field] == null ||
+        (request.resource.data[field] is string &&
+         request.resource.data[field].size() >= minLen &&
+         request.resource.data[field].size() <= maxLen);
+    }
+
+    // Validate that immutable fields have not changed during an update
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // Check if the authenticated user's email is in the hardcoded bootstrap admin allowlist
+    function isBootstrapAdmin() {
+      return isAuthenticated() &&
+        request.auth.token.email is string &&
+        (request.auth.token.email in ['ankith88@gmail.com', 'tanvihegde19@gmail.com']);
+    }
+
+    // Check if the authenticated user's email is in settings/site.data.adminEmails
+    function isSiteSettingsAdmin() {
+      return isAuthenticated() &&
+        request.auth.token.email is string &&
+        exists(/databases/$(database)/documents/settings/site) &&
+        ('adminEmails' in get(/databases/$(database)/documents/settings/site).data) &&
+        (get(/databases/$(database)/documents/settings/site).data.adminEmails is list) &&
+        (request.auth.token.email in get(/databases/$(database)/documents/settings/site).data.adminEmails);
+    }
+
+    // Check if the user is an authorized administrator
+    function isAdmin() {
+      return isBootstrapAdmin() || isSiteSettingsAdmin();
+    }
+
+    // Check if the user is an authorized administrator for a specific settings document
+    function isAdminForSettingsDoc() {
+      return isBootstrapAdmin() ||
+        (isAuthenticated() &&
+         request.auth.token.email is string &&
+         resource != null &&
+         ('adminEmails' in resource.data) &&
+         (resource.data.adminEmails is list) &&
+         (request.auth.token.email in resource.data.adminEmails)) ||
+        isSiteSettingsAdmin();
+    }
+
+    // ===============================================================
+    // Domain Validators (Used in BOTH create and update)
+    // ===============================================================
+
+    function isValidSiteSettings(data) {
+      return (!('orderingFeatureEnabled' in data) || data.orderingFeatureEnabled is bool) &&
+        (!('orderWindowMode' in data) ||
+          (data.orderWindowMode is string && data.orderWindowMode in ['auto', 'open', 'closed'])) &&
+        (!('adminEmails' in data) ||
+          (data.adminEmails is list && data.adminEmails.size() <= 50)) &&
+        (!('updatedAt' in data) ||
+          data.updatedAt == null ||
+          data.updatedAt is timestamp ||
+          (data.updatedAt is string && data.updatedAt.size() <= 100)) &&
+        isValidOptionalString('updatedBy', 0, 320);
+    }
+
+    function isValidRecipe(data) {
+      return isValidOptionalString('name', 1, 200) &&
+        isValidOptionalString('description', 1, 1000) &&
+        isValidOptionalString('longDescription', 0, 5000) &&
+        isValidOptionalString('imageUrl', 1, 2048) &&
+        isValidOptionalString('imageHint', 0, 200) &&
+        (!('price' in data) || (data.price is number && data.price >= 0 && data.price <= 10000)) &&
+        (!('rating' in data) || (data.rating is number && data.rating >= 0 && data.rating <= 5)) &&
+        (!('reviews' in data) || (data.reviews is number && data.reviews >= 0)) &&
+        (!('ingredients' in data) || (data.ingredients is list && data.ingredients.size() <= 100)) &&
+        (!('instructions' in data) || (data.instructions is list && data.instructions.size() <= 100)) &&
+        (!('isWeekly' in data) || data.isWeekly is bool);
+    }
+
+    function isValidRating(data) {
+      return hasOnlyAllowedFields(['rating', 'comment', 'createdAt']) &&
+        hasRequiredFields(['rating']) &&
+        data.rating is number &&
+        data.rating >= 1 &&
+        data.rating <= 5 &&
+        isValidOptionalString('comment', 0, 500) &&
+        (!('createdAt' in data) ||
+          data.createdAt is timestamp ||
+          (data.createdAt is string && data.createdAt.size() <= 100));
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    // 1. Site & Storefront Settings (`settings/{settingId}`, e.g. `settings/site`)
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidSiteSettings(request.resource.data);
+      allow update: if isAdminForSettingsDoc() && isValidSiteSettings(request.resource.data);
+      allow delete: if isAdminForSettingsDoc();
+    }
+
+    // 2. Recipes (`recipes/{recipeId}`)
+    match /recipes/{recipeId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidRecipe(request.resource.data);
+      allow update: if isAdmin() && isValidRecipe(request.resource.data);
+      allow delete: if isAdmin();
+
+      // 3. Recipe Ratings (`recipes/{recipeId}/ratings/{ratingId}`)
+      match /ratings/{ratingId} {
+        allow read: if true;
+        allow create: if isValidRating(request.resource.data);
+        allow update: if isAdmin() && isValidRating(request.resource.data) && areImmutableFieldsUnchanged(['createdAt']);
+        allow delete: if isAdmin();
+      }
+    }
+
+    // Default deny all other collections and documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

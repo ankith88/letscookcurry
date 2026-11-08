@@ -9,7 +9,9 @@ import {
   DEFAULT_SITE_SETTINGS,
   SITE_SETTINGS_COLLECTION,
   SITE_SETTINGS_DOC_ID,
+  SITE_SETTINGS_STORAGE_KEY,
   computeIsOrdersOpen,
+  getSiteSettings,
   normalizeSiteSettings,
   updateSiteSettings,
 } from '@/lib/settings';
@@ -53,22 +55,37 @@ export function SiteSettingsProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     setIsClientMounted(true);
 
+    // Load initial settings (from Firestore or server/local fallback)
+    getSiteSettings().then((initial) => {
+      setSettings(initial);
+      setLoading(false);
+    });
+
     const settingsRef = doc(db, SITE_SETTINGS_COLLECTION, SITE_SETTINGS_DOC_ID);
     const unsubscribeSettings = onSnapshot(
       settingsRef,
       (snapshot) => {
         if (snapshot.exists()) {
           setSettings(normalizeSiteSettings(snapshot.data() as Partial<SiteSettings>));
-        } else {
-          setSettings(DEFAULT_SITE_SETTINGS);
+          setLoading(false);
         }
-        setLoading(false);
       },
-      (error) => {
-        console.error('Error subscribing to site settings:', error);
+      () => {
+        // If Firestore snapshot fails due to rules not yet deployed, getSiteSettings() already loaded fallback
         setLoading(false);
       }
     );
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === SITE_SETTINGS_STORAGE_KEY && e.newValue) {
+        try {
+          setSettings(normalizeSiteSettings(JSON.parse(e.newValue)));
+        } catch {
+          // Ignore parse error
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
 
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
@@ -78,6 +95,7 @@ export function SiteSettingsProvider({ children }: { children: React.ReactNode }
     return () => {
       unsubscribeSettings();
       unsubscribeAuth();
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 
@@ -123,4 +141,3 @@ export function SiteSettingsProvider({ children }: { children: React.ReactNode }
 export function useSiteSettings() {
   return useContext(SiteSettingsContext);
 }
-
