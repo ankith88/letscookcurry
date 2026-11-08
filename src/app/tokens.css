@@ -1,20 +1,56 @@
 :root {
   --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
   --text-xs: 0.8125rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.25rem; --text-xl: 1.5625rem; --text-2xl: 1.953rem; --text-3xl: 2.441rem;
-  --text-display-s: clamp(2.25rem, 4vw + 0.5rem, 3.75rem); --text-display: clamp(2.75rem, 5vw + 1rem, 5.25rem);
-  --text-section: clamp(2rem, 2.5vw + 1rem, 3.5rem); --text-title: clamp(1.25rem, 0.75vw + 0.875rem, 1.625rem); --text-lead: clamp(1.125rem, 0.35vw + 1rem, 1.375rem);
+  --text-display-s: clamp(2.15rem, 3.6vw + 0.5rem, 3.5rem); --text-display: clamp(2.5rem, 4.4vw + 0.75rem, 4.5rem);
+  --text-section: clamp(1.85rem, 2.3vw + 0.85rem, 3.15rem); --text-title: clamp(1.2rem, 0.65vw + 0.85rem, 1.5rem); --text-lead: clamp(1.0625rem, 0.35vw + 0.95rem, 1.25rem);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-in: cubic-bezier(0.7, 0, 0.84, 0); --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 420ms;
-  --color-error: oklch(52% 0.19 27); --color-success: oklch(50% 0.12 150);
-  --container: 1440px; --gutter: 64px; --gap-columns: 32px; --section-gap-s: 120px; --section-gap: 144px; --section-gap-l: 176px;
+  --color-error: #b42318; --color-success: #38450f;
+  --container: 1440px; --gutter: 48px; --gap-columns: 32px; --section-gap-s: 96px; --section-gap: 128px; --section-gap-l: 160px;
   --z-base: 1; --z-raised: 10; --z-dropdown: 100; --z-sticky: 200; --z-sticky-nav: 300; --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
-  --color-paper: oklch(96.8% 0.018 82); --color-paper-2: oklch(93.8% 0.025 80); --color-paper-3: oklch(89.5% 0.035 78);
-  --color-ink: oklch(22% 0.032 55); --color-ink-2: oklch(34% 0.030 55); --color-muted: oklch(46% 0.026 58);
-  --color-rule: oklch(83% 0.028 76);
-  --color-accent: oklch(76% 0.155 68); --color-accent-ink: oklch(20% 0.032 55); --color-focus: oklch(62% 0.160 62);
-  --color-leaf: oklch(36% 0.068 128); --color-leaf-ink: oklch(97% 0.014 84);
-  --font-display: var(--font-headline), "Playfair Display", Georgia, serif; --font-body: var(--font-lato), "Lato", ui-sans-serif, system-ui, sans-serif; --font-outlier: var(--font-body);
-  --radius-card: 16px; --radius-pill: 999px; --rule-hair: 1px;
-  --shadow-card: 0 12px 32px -12px oklch(22% 0.032 55 / 0.10);
-  --tracking-display: -0.022em;
+
+  /* Let's Cook Curry Logo Palette:
+   * - Logo Golden Amber: #f7a832
+   * - Logo Curry-Leaf Botanical Olive: #38450f / #3d4d18
+   * - Logo Crisp Warm Cream: #fcf8ef */
+  --p-bg: #fcf8ef;
+  --p-surface: #f5ebd6;
+  --p-ink: #232912;
+  --p-muted: #555c42;
+  --p-accent: #f7a832;
+  --p-accent-ink: #232912;
+  --p-action: #38450f;
+  --p-action-ink: #fcf8ef;
+  --p-inv-bg: #38450f;
+  --p-inv-surface: #2d380b;
+  --p-inv-ink: #fcf8ef;
+  --p-inv-muted: #d4d9c1;
+  --p-inv-accent: #f7a832;
+  --p-inv-accent-ink: #232912;
+  --p-inv-action: #f7a832;
+  --p-inv-action-ink: #232912;
+
+  --color-paper: #fcf8ef;
+  --color-paper-2: #f5ebd6;
+  --color-paper-3: #eadab8;
+  --color-ink: #232912;
+  --color-ink-2: #38450f;
+  --color-muted: #555c42;
+  --color-rule: #e2d4b5;
+  --color-accent: #f7a832;
+  --color-accent-ink: #232912;
+  --color-focus: #38450f;
+  --color-leaf: #38450f;
+  --color-leaf-ink: #fcf8ef;
+
+  --font-display: var(--font-headline), "Besley", Georgia, serif;
+  --font-text: var(--font-body), "Albert Sans", system-ui, sans-serif;
+  --font-outlier: var(--font-body);
+  --display-weight: 500;
+  --display-tracking: -0.02em;
+  --tracking-display: -0.02em;
+  --radius-card: 14px;
+  --radius-pill: 999px;
+  --rule-hair: 1px;
+  --shadow-card: 0 10px 28px -12px rgba(35, 41, 18, 0.10);
 }

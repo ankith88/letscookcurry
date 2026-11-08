@@ -10,9 +10,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['var(--font-body)', 'Lato', 'sans-serif'],
-        headline: ['var(--font-display)', 'Playfair Display', 'serif'],
-        display: ['var(--font-display)', 'Playfair Display', 'serif'],
+        body: ['var(--font-body)', 'Albert Sans', 'system-ui', 'sans-serif'],
+        headline: ['var(--font-headline)', 'Besley', 'Georgia', 'serif'],
+        display: ['var(--font-headline)', 'Besley', 'Georgia', 'serif'],
         code: ['monospace'],
       },
       colors: {

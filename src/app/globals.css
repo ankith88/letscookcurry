@@ -1,11 +1,8 @@
-/* Hallmark · shape: Split Studio · genre: editorial · theme: brand · redesign: full
- * paper: oklch(96.8% 0.018 82) · accent: oklch(76% 0.155 68) · display: Playfair Display · body: Lato · hero: Split · nav: kept · footer: kept · signature: deep curry-leaf diptych stage with sticky left studio rail and 6-day kitchen board
- * axes: light/roman-serif/warm · posture: restrained · contrast: pass · fold: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 · weakest: R, added scrub-linked statement head wipe and diptych entrance choreography */
-/* Hallmark · reworded "Order Monday – Thursday • Fresh Delivery Every Monday" to "Orders open Monday to Thursday, delivered fresh Monday." · 19 and 63 name dashes and middle-dots */
-/* Hallmark · reworded "Orders Open: Mon – Thu" to "Orders Open: Monday to Thursday" · 19 names the dash */
-/* Hallmark · dropped "Limited Weekly Selection" · 54 and 67 name the eyebrow */
-/* Hallmark · dropped "Recipe Archive & Inspiration" · 54 and 67 name the eyebrow */
+/* Let's Cook Curry · Brand Palette matched to Logo:
+ * - Primary (Buttons & Actions): Curry-Leaf Botanical Olive (#38450f / hsl(75 63% 16%))
+ * - Accent (Logo Circle Gold): Warm Golden Amber (#f7a832 / hsl(36 93% 58%))
+ * - Ground: Crisp Warm Cream (#fcf8ef / hsl(42 65% 96%))
+ * - Surface: Soft Saffron Cream (#f5ebd6 / hsl(41 56% 90%)) */
 @import "./tokens.css";
 @import "./base.css" layer(base);
 
@@ -24,55 +21,57 @@ html {
 }
 
 body {
-  font-family: var(--font-body);
+  font-family: var(--font-text);
+  background-color: var(--p-bg);
+  color: var(--p-ink);
 }
 
 @layer base {
   :root {
-    --background: 39 77% 96%;
-    --foreground: 24 20% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 24 20% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 24 20% 15%;
-    --primary: 35 92% 59%;
-    --primary-foreground: 24 20% 10%;
-    --secondary: 38 35% 88%;
-    --secondary-foreground: 24 20% 16%;
-    --muted: 38 30% 91%;
-    --muted-foreground: 24 12% 36%;
-    --accent: 35 92% 59%;
-    --accent-foreground: 24 20% 10%;
-    --destructive: 0 78% 48%;
+    --background: 42 65% 96%;          /* #fcf8ef Crisp Warm Cream */
+    --foreground: 75 39% 12%;          /* #232912 Deep Olive Ink */
+    --card: 42 75% 98%;                /* #fdfbf6 Warm White Card */
+    --card-foreground: 75 39% 12%;     /* #232912 */
+    --popover: 42 75% 98%;             /* #fdfbf6 */
+    --popover-foreground: 75 39% 12%;  /* #232912 */
+    --primary: 75 63% 16%;             /* #38450f Curry-Leaf Botanical Olive (Buttons) */
+    --primary-foreground: 42 65% 97%;  /* #fcf9f2 Crisp Cream Text */
+    --secondary: 40 56% 90%;           /* #f5ebd6 Soft Golden-Amber Cream */
+    --secondary-foreground: 75 39% 12%;/* #232912 */
+    --muted: 41 42% 91%;               /* #f2ead9 Muted Cream */
+    --muted-foreground: 76 16% 31%;    /* #555c42 Muted Olive */
+    --accent: 36 93% 58%;              /* #f7a832 Logo Golden Amber */
+    --accent-foreground: 75 39% 12%;   /* #232912 Deep Olive Ink on Gold */
+    --destructive: 8 72% 41%;
     --destructive-foreground: 0 0% 98%;
-    --border: 35 24% 82%;
-    --input: 35 24% 82%;
-    --ring: 35 92% 59%;
+    --border: 39 40% 80%;              /* #e2d4b5 Warm Golden Rule */
+    --input: 39 40% 78%;
+    --ring: 75 63% 16%;                /* #38450f Curry-Leaf Olive Focus Ring */
     --radius: 0.75rem;
-    --nav-hover: 88 38% 28%;
+    --nav-hover: 75 63% 16%;           /* #38450f Curry-Leaf Olive */
   }
 
   .dark {
-    --background: 78 36% 12%;
-    --foreground: 78 20% 94%;
-    --card: 78 36% 15%;
-    --card-foreground: 78 20% 94%;
-    --popover: 78 36% 12%;
-    --popover-foreground: 78 20% 94%;
-    --primary: 35 92% 59%;
-    --primary-foreground: 24 10% 10%;
-    --secondary: 78 36% 25%;
-    --secondary-foreground: 78 20% 94%;
-    --muted: 78 36% 20%;
-    --muted-foreground: 78 15% 70%;
-    --accent: 40 98% 68%;
-    --accent-foreground: 24 10% 10%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 75 45% 10%;          /* #1e240d Deep Curry-Leaf Night */
+    --foreground: 42 65% 95%;          /* #faf5e8 */
+    --card: 75 42% 13%;                /* #262e11 */
+    --card-foreground: 42 65% 95%;
+    --popover: 75 45% 11%;
+    --popover-foreground: 42 65% 95%;
+    --primary: 75 55% 24%;             /* #4a5c14 Rich Botanical Olive */
+    --primary-foreground: 42 65% 97%;
+    --secondary: 75 35% 18%;
+    --secondary-foreground: 42 65% 95%;
+    --muted: 75 32% 17%;
+    --muted-foreground: 72 18% 70%;
+    --accent: 36 93% 58%;              /* #f7a832 Logo Golden Amber */
+    --accent-foreground: 75 45% 10%;
+    --destructive: 0 62.8% 35.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 78 36% 25%;
-    --input: 78 36% 25%;
-    --ring: 38 98% 65%;
-    --nav-hover: 88 38% 28%;
+    --border: 75 30% 22%;
+    --input: 75 30% 22%;
+    --ring: 36 93% 58%;
+    --nav-hover: 75 55% 24%;
   }
 }
 
@@ -85,7 +84,7 @@ body {
   }
 }
 
-/* Interactive states (Floor & Gate 26b) */
+/* Quiet, tactile hover & press micro-interactions */
 button,
 a[role="button"],
 [type="button"],
@@ -118,11 +117,34 @@ textarea:disabled,
   cursor: not-allowed;
 }
 
-/* Split Studio Diptych Hero Entrance (two halves fade in 80ms apart) */
-@keyframes diptych-enter {
+/* Linked card lifts 2px; photo zooms 1.025 inside its frame */
+.taste-card {
+  transition:
+    transform 240ms var(--ease-out),
+    border-color 240ms var(--ease-out),
+    box-shadow 240ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .taste-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+  }
+
+  .taste-card .taste-photo {
+    transition: transform 380ms var(--ease-out);
+  }
+
+  .taste-card:hover .taste-photo {
+    transform: scale(1.025);
+  }
+}
+
+/* Hero entrance choreography (data-enter) */
+@keyframes hero-enter-up {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -131,31 +153,13 @@ textarea:disabled,
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .diptych-left {
-    animation: diptych-enter var(--dur-long) var(--ease-out) 20ms both;
+  [data-enter] .enter-1 {
+    animation: hero-enter-up 380ms var(--ease-out) 20ms both;
   }
-  .diptych-right {
-    animation: diptych-enter var(--dur-long) var(--ease-out) 100ms both;
+  [data-enter] .enter-2 {
+    animation: hero-enter-up 420ms var(--ease-out) 90ms both;
   }
-}
-
-/* Scroll Choreography: Scrub-linked Statement Headline Wipe */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) and (min-width: 40rem) {
-    .statement-wipe {
-      animation: head-wipe linear both;
-      animation-timeline: view();
-      animation-range: entry 15% cover 42%;
-    }
-    @keyframes head-wipe {
-      from {
-        clip-path: inset(0 100% 0 0);
-        transform: translateX(-0.2em);
-      }
-      to {
-        clip-path: inset(0 0 0 0);
-        transform: none;
-      }
-    }
+  [data-enter] .enter-3 {
+    animation: hero-enter-up 440ms var(--ease-out) 160ms both;
   }
 }

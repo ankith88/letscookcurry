@@ -1,6 +1,6 @@
 
 import type { Metadata } from 'next';
-import { Lato, Playfair_Display } from 'next/font/google';
+import { Albert_Sans, Besley } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/layout/header';
@@ -11,16 +11,16 @@ import { Toaster } from '@/components/ui/toaster';
 import Script from 'next/script';
 import { GTM_ID } from '@/lib/firebase';
 
-const lato = Lato({
+const albertSans = Albert_Sans({
   subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-lato',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-body',
   display: 'swap',
 });
 
-const playfairDisplay = Playfair_Display({
+const besley = Besley({
   subsets: ['latin'],
-  weight: ['600', '700'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-headline',
   display: 'swap',
 });
@@ -38,11 +38,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn('light', lato.variable, playfairDisplay.variable)}
+      data-type="place"
+      data-radius="soft"
+      className={cn('light', albertSans.variable, besley.variable)}
       suppressHydrationWarning
     >
       <head>
-        <link rel="icon" href="https://firebasestorage.googleapis.com/v0/b/lets-cook-curry-xrwg7.firebasestorage.app/o/letscookcurry-%20logo.png?alt=media&token=39f4c042-7108-4a35-8ce0-5ba1d2ab4314" />
+        <meta name="page-type" content="place" />
+        <meta name="site-kind" content="other" />
+        <meta name="page-kind" content="place" />
+        <link
+          rel="icon"
+          href="https://firebasestorage.googleapis.com/v0/b/lets-cook-curry-xrwg7.firebasestorage.app/o/letscookcurry-%20logo.png?alt=media&token=39f4c042-7108-4a35-8ce0-5ba1d2ab4314"
+        />
         {/* Google tag (gtag.js) */}
         <Script
           strategy="afterInteractive"
@@ -63,16 +71,20 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={cn(
-          'min-h-screen bg-background font-body antialiased'
-        )}
-      >
+      <body className={cn('min-h-screen bg-background font-body text-foreground antialiased')}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[600] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-lg"
+        >
+          Skip to main content
+        </a>
         <SiteSettingsProvider>
           <CartProvider>
             <div className="relative flex min-h-screen flex-col">
               <Header />
-              <main className="flex-1">{children}</main>
+              <main id="main-content" className="flex-1">
+                {children}
+              </main>
               <Footer />
             </div>
             <Toaster />

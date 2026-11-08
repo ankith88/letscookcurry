@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Flame } from 'lucide-react';
@@ -11,9 +10,9 @@ interface SpiceLevelProps {
 }
 
 const spiceConfig = {
-  mild: { level: 1, label: 'Mild', color: 'text-primary fill-primary/60' },
+  mild: { level: 1, label: 'Mild', color: 'text-primary fill-primary/65' },
   medium: { level: 2, label: 'Medium', color: 'text-primary fill-primary' },
-  hot: { level: 3, label: 'Hot', color: 'text-destructive fill-destructive/80' },
+  hot: { level: 3, label: 'Hot', color: 'text-destructive fill-destructive/85' },
   'very-hot': { level: 4, label: 'Very Hot', color: 'text-destructive fill-destructive' },
 };
 
@@ -26,7 +25,7 @@ export function SpiceLevel({ spice }: SpiceLevelProps) {
   return (
     <Badge
       variant="outline"
-      className="gap-1.5 capitalize"
+      className="gap-1.5 capitalize text-xs bg-background border-border"
       aria-label={`Spice level: ${config.label}`}
     >
       <div className="flex items-center gap-0.5" aria-hidden="true">
@@ -34,13 +33,13 @@ export function SpiceLevel({ spice }: SpiceLevelProps) {
           <Flame
             key={index}
             className={cn(
-              'w-3.5 h-3.5',
+              'w-3 h-3',
               index < config.level ? config.color : 'text-muted-foreground/30'
             )}
           />
         ))}
       </div>
-      {config.label}
+      <span>{config.label}</span>
     </Badge>
   );
 }

@@ -1,11 +1,8 @@
-
 "use client";
 
 import { useCart } from "@/hooks/use-cart";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -19,7 +16,16 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { History, LogOut, Pencil, PlusCircle, ShieldCheck, ShoppingBag, UtensilsCrossed } from "lucide-react";
+import {
+  ArrowRight,
+  History,
+  LogOut,
+  Pencil,
+  PlusCircle,
+  ShieldCheck,
+  ShoppingBag,
+  UtensilsCrossed,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -120,35 +126,22 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 py-12 sm:px-6">
         <div className="space-y-8 max-w-4xl mx-auto">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <Skeleton className="h-14 w-14 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-6 w-48" />
-                  <Skeleton className="h-4 w-64" />
-                </div>
+          <div className="rounded-2xl border border-border bg-card p-8">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-16 w-16 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-4 w-64" />
               </div>
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-10 w-32" />
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           {orderingFeatureEnabled && (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <History className="h-6 w-6 text-primary" aria-hidden="true" />
-                  <CardTitle className="text-2xl font-headline">Order History</CardTitle>
-                </div>
-                <CardDescription>Review your past orders and quickly reorder your favorites.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-32 w-full" />
-              </CardContent>
-            </Card>
+            <div className="rounded-2xl border border-border bg-card p-8 space-y-4">
+              <Skeleton className="h-7 w-48" />
+              <Skeleton className="h-32 w-full rounded-xl" />
+            </div>
           )}
         </div>
       </div>
@@ -164,127 +157,165 @@ export default function ProfilePage() {
     .toUpperCase();
 
   return (
-    <div className="container mx-auto px-4 py-10 sm:px-6 lg:px-8">
+    <div className="container mx-auto px-4 py-12 sm:px-6">
       <div className="space-y-8 max-w-4xl mx-auto">
-        <Card className="border-border/70 shadow-sm">
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-14 w-14 border border-border">
-                  <AvatarFallback className="bg-primary/15 text-primary font-headline text-lg font-bold">
-                    {userInitials}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <CardTitle className="text-2xl font-headline">
-                      {user.displayName || "Valued Curry Lover"}
-                    </CardTitle>
-                    {isAdmin && (
-                      <Badge className="gap-1 text-xs font-semibold">
-                        <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                        Admin
-                      </Badge>
-                    )}
-                  </div>
-                  <CardDescription>{user.email}</CardDescription>
+        {/* Profile Card */}
+        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-16 w-16 border border-border">
+                <AvatarFallback className="bg-primary text-primary-foreground font-headline text-xl font-medium">
+                  {userInitials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h1 className="text-2xl sm:text-3xl font-headline font-medium text-foreground">
+                    {user.displayName || "Valued Curry Lover"}
+                  </h1>
+                  {isAdmin && (
+                    <Badge className="gap-1 text-xs font-semibold bg-primary text-primary-foreground">
+                      <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                      Admin
+                    </Badge>
+                  )}
                 </div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Pencil className="mr-2 h-4 w-4" aria-hidden="true" />
-                      Edit Profile
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <form onSubmit={handleSaveProfile}>
-                      <DialogHeader>
-                        <DialogTitle className="font-headline text-xl">Edit Profile</DialogTitle>
-                        <DialogDescription>
-                          Update how your name appears on your account.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="py-4 space-y-2">
-                        <Label htmlFor="displayName">Display Name</Label>
-                        <Input
-                          id="displayName"
-                          value={displayNameInput}
-                          onChange={(e) => setDisplayNameInput(e.target.value)}
-                          placeholder="e.g. Tanvi & Ankith"
-                        />
-                      </div>
-                      <DialogFooter>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => setIsEditOpen(false)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button type="submit" disabled={isSavingProfile}>
-                          {isSavingProfile ? "Saving..." : "Save Changes"}
-                        </Button>
-                      </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-
-                <Button variant="destructive" size="sm" onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Sign Out
-                </Button>
+                <p className="text-sm text-muted-foreground">{user.email}</p>
               </div>
             </div>
-          </CardHeader>
-        </Card>
 
+            <div className="flex flex-wrap gap-2.5">
+              <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl h-10 bg-background hover:bg-primary hover:text-primary-foreground"
+                  >
+                    <Pencil className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Edit Profile
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md bg-card border-border rounded-2xl">
+                  <form onSubmit={handleSaveProfile}>
+                    <DialogHeader>
+                      <DialogTitle className="font-headline text-xl font-medium">
+                        Edit Profile
+                      </DialogTitle>
+                      <DialogDescription>
+                        Update how your name appears on your account.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 space-y-2">
+                      <Label htmlFor="displayName">Display Name</Label>
+                      <Input
+                        id="displayName"
+                        value={displayNameInput}
+                        onChange={(e) => setDisplayNameInput(e.target.value)}
+                        placeholder="e.g. Tanvi & Ankith"
+                        className="rounded-xl bg-background"
+                      />
+                    </div>
+                    <DialogFooter className="gap-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="rounded-xl"
+                        onClick={() => setIsEditOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="rounded-xl bg-primary text-primary-foreground"
+                        disabled={isSavingProfile}
+                      >
+                        {isSavingProfile ? "Saving..." : "Save Changes"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+
+              <Button
+                variant="destructive"
+                size="sm"
+                className="rounded-xl h-10"
+                onClick={handleSignOut}
+              >
+                <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
+                Sign Out
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Admin Studio Banner */}
         {(isAdmin || canBootstrapAdmin) && (
-          <Card className="border-primary/40 bg-primary/5 shadow-sm">
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <ShieldCheck className="h-6 w-6 text-primary" aria-hidden="true" />
-                  <div>
-                    <CardTitle className="text-xl font-headline">Admin Studio</CardTitle>
-                    <CardDescription>
-                      Manage ordering mode, open/close weekly orders, and add or edit recipes in Firestore.
-                    </CardDescription>
-                  </div>
-                </div>
-                <Button asChild size="sm" className="font-semibold">
-                  <Link href="/admin">Open Admin Studio</Link>
-                </Button>
+          <div className="rounded-2xl bg-[#38450f] text-[#fcf8ef] p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className="flex items-start gap-4">
+              <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2d380b] text-[#f7a832] border border-[#fcf8ef]/15">
+                <ShieldCheck className="h-6 w-6" aria-hidden="true" />
               </div>
-            </CardHeader>
-          </Card>
+              <div className="space-y-1">
+                <h2 className="text-xl font-headline font-medium text-[#fcf8ef]">
+                  Admin Studio
+                </h2>
+                <p className="text-sm text-[#e2e6d5] leading-relaxed">
+                  Manage ordering mode, open/close weekly orders, and add or edit recipes in Firestore.
+                </p>
+              </div>
+            </div>
+            <Button
+              asChild
+              className="rounded-xl h-11 px-6 font-semibold bg-accent text-accent-foreground hover:bg-accent/90 shrink-0"
+            >
+              <Link href="/admin">
+                <span>Open Admin Studio</span>
+                <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+              </Link>
+            </Button>
+          </div>
         )}
 
+        {/* Order History */}
         {orderingFeatureEnabled && (
-          <Card className="border-border/70 shadow-sm">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <History className="h-6 w-6 text-primary" aria-hidden="true" />
-                <CardTitle className="text-2xl font-headline">Order History</CardTitle>
+          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex items-center justify-between border-b border-border pb-5">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2.5">
+                  <History className="h-5 w-5 text-primary" aria-hidden="true" />
+                  <h2 className="text-2xl font-headline font-medium text-foreground">
+                    Order History
+                  </h2>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Review your past weekly orders and reorder your favorites with one click.
+                </p>
               </div>
-              <CardDescription>
-                Review your past weekly orders and reorder your favorites with one click.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              {orderHistory.length > 0 ? (
-                orderHistory.map((order) => (
-                  <div key={order.id} className="rounded-xl border border-border/70 bg-background/60 p-5">
-                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
+              <span className="num rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-foreground border border-border">
+                {orderHistory.length} {orderHistory.length === 1 ? 'Order' : 'Orders'}
+              </span>
+            </div>
+
+            {orderHistory.length > 0 ? (
+              <div className="space-y-6">
+                {orderHistory.map((order) => (
+                  <div
+                    key={order.id}
+                    className="rounded-xl border border-border bg-background p-5 space-y-4"
+                  >
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-4 border-b border-border">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-headline font-bold text-lg">{order.id}</h3>
-                          <span className="text-sm font-semibold text-primary">
+                        <div className="flex items-center gap-3">
+                          <h3 className="num font-headline font-medium text-lg text-foreground">
+                            {order.id}
+                          </h3>
+                          <span className="num rounded-md bg-accent px-2.5 py-0.5 text-sm font-bold text-accent-foreground">
                             ${Number(order.total).toFixed(2)}
                           </span>
                         </div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           Ordered on{" "}
                           {new Date(order.date).toLocaleDateString('en-AU', {
                             year: 'numeric',
@@ -294,66 +325,70 @@ export default function ProfilePage() {
                         </p>
                       </div>
                       <Button
-                        variant="secondary"
                         size="sm"
-                        className="font-semibold"
+                        className="rounded-lg font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
                         onClick={() => handleReorder(order.items)}
                       >
                         <PlusCircle className="mr-2 h-4 w-4" aria-hidden="true" />
                         Reorder All
                       </Button>
                     </div>
-                    <div className="space-y-3">
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {order.items.map((item) => (
                         <div
                           key={item.id}
-                          className="flex items-center justify-between p-3 bg-card rounded-lg border border-border/60"
+                          className="flex items-center justify-between p-3 bg-card rounded-xl border border-border"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
                             <Image
                               src={item.imageUrl}
                               alt={item.name}
                               width={48}
                               height={48}
-                              className="h-12 w-12 rounded-md object-cover"
+                              className="h-12 w-12 shrink-0 rounded-lg object-cover border border-border"
                               data-ai-hint={item.imageHint}
                             />
-                            <div>
-                              <p className="font-medium text-sm sm:text-base">{item.name}</p>
-                              <p className="text-xs text-muted-foreground">
+                            <div className="min-w-0">
+                              <p className="font-medium text-sm text-foreground truncate">
+                                {item.name}
+                              </p>
+                              <p className="num text-xs text-muted-foreground">
                                 Qty: {item.quantity || 1} &times; ${Number(item.price).toFixed(2)}
                               </p>
                             </div>
                           </div>
-                          <Button asChild variant="ghost" size="sm">
+                          <Button asChild variant="ghost" size="sm" className="rounded-lg shrink-0">
                             <Link href={`/recipe/${item.id}`}>View</Link>
                           </Button>
                         </div>
                       ))}
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="rounded-xl border border-dashed border-border py-12 px-4 text-center space-y-3">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <ShoppingBag className="h-6 w-6" aria-hidden="true" />
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="font-headline text-lg font-bold">No past orders yet</h3>
-                    <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                      Once you place an order from our weekly menu, it will appear here for easy reordering.
-                    </p>
-                  </div>
-                  <Button asChild className="mt-2">
-                    <Link href="/#recipes">
-                      <UtensilsCrossed className="mr-2 h-4 w-4" aria-hidden="true" />
-                      Explore This Week&apos;s Curries
-                    </Link>
-                  </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-border bg-background py-12 px-4 text-center space-y-3">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-primary border border-border">
+                  <ShoppingBag className="h-6 w-6" aria-hidden="true" />
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <div className="space-y-1">
+                  <h3 className="font-headline text-lg font-medium text-foreground">
+                    No past orders yet
+                  </h3>
+                  <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                    Once you place an order from our weekly menu, it will appear here for easy reordering.
+                  </p>
+                </div>
+                <Button asChild className="mt-2 rounded-xl bg-primary text-primary-foreground">
+                  <Link href="/#recipes">
+                    <UtensilsCrossed className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Explore This Week&apos;s Curries
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
