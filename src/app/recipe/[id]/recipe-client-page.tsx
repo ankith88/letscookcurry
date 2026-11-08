@@ -372,7 +372,7 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
               <span>Step-by-Step Method</span>
             </h2>
             <p className="text-base text-muted-foreground">
-              Follow these steps in order to temper the whole spices and build a rich curry base.
+              Have your ingredients prepped and within reach before you turn on the stove.
             </p>
           </div>
 
