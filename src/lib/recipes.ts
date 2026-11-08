@@ -120,6 +120,7 @@ export async function createRecipe(
     diet: recipeData.diet,
     spice: recipeData.spice,
     isWeekly: Boolean(recipeData.isWeekly),
+    isFeatured: Boolean(recipeData.isFeatured),
   };
 
   await setDoc(recipeRef, normalized);
@@ -145,6 +146,14 @@ export async function toggleRecipeWeekly(
 ): Promise<void> {
   const recipeRef = doc(db, 'recipes', id);
   await updateDoc(recipeRef, { isWeekly });
+}
+
+export async function toggleRecipeFeatured(
+  id: string,
+  isFeatured: boolean
+): Promise<void> {
+  const recipeRef = doc(db, 'recipes', id);
+  await updateDoc(recipeRef, { isFeatured });
 }
 
 export async function bulkCreateRecipes(recipes: RecipeInput[]): Promise<number> {

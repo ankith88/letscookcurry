@@ -10,6 +10,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   orderingFeatureEnabled: true,
   orderWindowMode: 'auto',
   adminEmails: ['ankith88@gmail.com', 'tanvihegde19@gmail.com'],
+  featuredRecipeId: '',
 };
 
 export function normalizeSiteSettings(raw?: Partial<SiteSettings> | null): SiteSettings {
@@ -40,6 +41,10 @@ export function normalizeSiteSettings(raw?: Partial<SiteSettings> | null): SiteS
         : DEFAULT_SITE_SETTINGS.orderingFeatureEnabled,
     orderWindowMode,
     adminEmails,
+    featuredRecipeId:
+      typeof raw.featuredRecipeId === 'string'
+        ? raw.featuredRecipeId.trim()
+        : DEFAULT_SITE_SETTINGS.featuredRecipeId,
   };
 
   if (typeof raw.updatedAt === 'string' && raw.updatedAt) {

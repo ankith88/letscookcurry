@@ -17,6 +17,7 @@ import {
   Search,
   ShieldCheck,
   Sparkles,
+  Star,
   Store,
   Trash2,
   UserPlus,
@@ -36,6 +37,13 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -50,6 +58,7 @@ import { useSiteSettings } from '@/context/site-settings-context';
 import {
   deleteRecipe,
   getAllRecipes,
+  toggleRecipeFeatured,
   toggleRecipeWeekly,
 } from '@/lib/recipes';
 import { getConfiguredAdminEmails } from '@/lib/admin';
@@ -244,6 +253,65 @@ export default function AdminPage() {
     }
   };
 
+  const activeFeaturedRecipe = useMemo(() => {
+    const configuredId = settings.featuredRecipeId?.trim();
+    if (configuredId) {
+      const found = recipes.find((r) => r.id === configuredId);
+      if (found) return found;
+    }
+    const flagged = recipes.find((r) => r.isFeatured);
+    if (flagged) return flagged;
+    if (orderingFeatureEnabled) {
+      const firstWeekly = recipes.find((r) => r.isWeekly);
+      if (firstWeekly) return firstWeekly;
+    }
+    return recipes[0] || null;
+  }, [recipes, settings.featuredRecipeId, orderingFeatureEnabled]);
+
+  const handleSelectFeaturedRecipe = async (recipeIdOrAuto: string) => {
+    const nextFeaturedId = recipeIdOrAuto === '__auto__' ? '' : recipeIdOrAuto;
+    const previousFeaturedId = settings.featuredRecipeId || '';
+    const targetRecipe = recipes.find((r) => r.id === nextFeaturedId);
+
+    setIsSavingSettings(true);
+    setRecipes((prev) =>
+      prev.map((r) => ({
+        ...r,
+        isFeatured: Boolean(nextFeaturedId && r.id === nextFeaturedId),
+      }))
+    );
+
+    try {
+      await saveSettings({ featuredRecipeId: nextFeaturedId });
+
+      // Best-effort sync of `isFeatured` flag on recipe documents in Firestore
+      const previouslyFlagged = recipes.filter(
+        (r) => (r.isFeatured || r.id === previousFeaturedId) && r.id !== nextFeaturedId
+      );
+      await Promise.allSettled([
+        ...previouslyFlagged.map((r) => toggleRecipeFeatured(r.id, false)),
+        ...(nextFeaturedId ? [toggleRecipeFeatured(nextFeaturedId, true)] : []),
+      ]);
+
+      toast({
+        title: nextFeaturedId
+          ? 'Homepage Featured Recipe Updated'
+          : 'Featured Recipe Set to Automatic',
+        description: targetRecipe
+          ? `"${targetRecipe.name}" is now showcased in the homepage hero Featured Recipe card.`
+          : 'The homepage hero will automatically showcase the first weekly or archive dish.',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Failed to Update Featured Recipe',
+        description: error.message || 'Could not save featured recipe selection.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSavingSettings(false);
+    }
+  };
+
   const handleConfirmDelete = async () => {
     if (!recipeToDelete) return;
     const target = recipeToDelete;
@@ -252,6 +320,9 @@ export default function AdminPage() {
     try {
       await deleteRecipe(target.id);
       setRecipes((prev) => prev.filter((r) => r.id !== target.id));
+      if (settings.featuredRecipeId === target.id) {
+        await saveSettings({ featuredRecipeId: '' });
+      }
       toast({
         title: 'Recipe Deleted',
         description: `"${target.name}" has been removed from Firestore.`,
@@ -272,6 +343,11 @@ export default function AdminPage() {
       setRecipes((prev) =>
         prev.map((r) => (r.id === savedRecipe.id ? savedRecipe : r))
       );
+    }
+    if (savedRecipe.isFeatured) {
+      handleSelectFeaturedRecipe(savedRecipe.id);
+    } else if (settings.featuredRecipeId === savedRecipe.id && !savedRecipe.isFeatured) {
+      handleSelectFeaturedRecipe('__auto__');
     }
   };
 
@@ -616,6 +692,72 @@ export default function AdminPage() {
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {/* Homepage Hero Featured Recipe Spotlight Selector */}
+          <div className="rounded-2xl border-2 border-primary/35 bg-primary/5 p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+              {activeFeaturedRecipe ? (
+                <Image
+                  src={activeFeaturedRecipe.imageUrl}
+                  alt={activeFeaturedRecipe.name}
+                  width={56}
+                  height={56}
+                  className="h-14 w-14 rounded-xl object-cover shrink-0 border border-border shadow-sm"
+                />
+              ) : (
+                <div className="h-14 w-14 rounded-xl bg-primary/15 text-primary flex items-center justify-center shrink-0">
+                  <Sparkles className="h-6 w-6" />
+                </div>
+              )}
+              <div className="space-y-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge className="bg-primary text-primary-foreground gap-1">
+                    <Star className="h-3 w-3 fill-current" />
+                    Homepage Featured Recipe
+                  </Badge>
+                  {!settings.featuredRecipeId && (
+                    <Badge variant="outline" className="text-[11px]">
+                      Auto-Selected
+                    </Badge>
+                  )}
+                </div>
+                <p className="font-headline text-lg font-bold text-foreground truncate">
+                  {activeFeaturedRecipe
+                    ? activeFeaturedRecipe.name
+                    : 'No recipe selected yet'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Choose which recipe is spotlighted in the Homepage Hero card, or click the{' '}
+                  <strong>Feature</strong> star on any recipe row below.
+                </p>
+              </div>
+            </div>
+
+            <div className="w-full lg:w-80 shrink-0">
+              <Label htmlFor="featured-recipe-select" className="sr-only">
+                Choose Homepage Featured Recipe
+              </Label>
+              <Select
+                value={settings.featuredRecipeId?.trim() || '__auto__'}
+                onValueChange={handleSelectFeaturedRecipe}
+                disabled={isSavingSettings || recipesLoading || recipes.length === 0}
+              >
+                <SelectTrigger id="featured-recipe-select" className="bg-background font-medium">
+                  <SelectValue placeholder="Choose a featured recipe..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__auto__">
+                    Automatic (First Weekly / Archive Dish)
+                  </SelectItem>
+                  {recipes.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      {r.name} ({r.region} • {r.diet})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           {/* Search & Weekly Filter Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="relative flex-1 max-w-md">
@@ -672,10 +814,18 @@ export default function AdminPage() {
             </div>
           ) : (
             <div className="divide-y divide-border rounded-xl border border-border overflow-hidden">
-              {filteredRecipes.map((recipe) => (
+              {filteredRecipes.map((recipe) => {
+                const isThisFeatured = activeFeaturedRecipe?.id === recipe.id;
+                const isExplicitlyFeatured =
+                  settings.featuredRecipeId?.trim() === recipe.id || Boolean(recipe.isFeatured);
+
+                return (
                 <div
                   key={recipe.id}
-                  className="p-4 bg-card hover:bg-muted/25 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  className={cn(
+                    'p-4 bg-card hover:bg-muted/25 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4',
+                    isThisFeatured && 'bg-primary/[0.04]'
+                  )}
                 >
                   <div className="flex items-center gap-4 min-w-0">
                     <Image
@@ -696,6 +846,12 @@ export default function AdminPage() {
                         <span className="num text-sm font-bold text-primary">
                           ${Number(recipe.price || 0).toFixed(2)}
                         </span>
+                        {isThisFeatured && (
+                          <Badge className="bg-primary/15 text-foreground border border-primary/40 hover:bg-primary/20 text-[11px] gap-1">
+                            <Star className="h-3 w-3 text-primary fill-primary" />
+                            Featured on Home
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-xs text-muted-foreground line-clamp-1">
                         {recipe.description}
@@ -718,7 +874,35 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 border-t sm:border-t-0 pt-3 sm:pt-0">
+                  <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 shrink-0 border-t sm:border-t-0 pt-3 sm:pt-0">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={isExplicitlyFeatured ? 'default' : 'outline'}
+                      disabled={isSavingSettings}
+                      onClick={() =>
+                        handleSelectFeaturedRecipe(
+                          isExplicitlyFeatured ? '__auto__' : recipe.id
+                        )
+                      }
+                      className="h-8 px-2.5 text-xs font-semibold gap-1.5"
+                      title={
+                        isExplicitlyFeatured
+                          ? 'Click to revert to automatic featured recipe selection'
+                          : `Set "${recipe.name}" as the Homepage Featured Recipe`
+                      }
+                    >
+                      <Star
+                        className={cn(
+                          'h-3.5 w-3.5',
+                          isExplicitlyFeatured
+                            ? 'fill-current'
+                            : 'text-muted-foreground'
+                        )}
+                      />
+                      {isExplicitlyFeatured ? 'Featured' : 'Feature'}
+                    </Button>
+
                     <div className="flex items-center gap-2 bg-secondary/40 px-3 py-1.5 rounded-lg border border-border/70">
                       <Label
                         htmlFor={`weekly-switch-${recipe.id}`}
@@ -759,7 +943,8 @@ export default function AdminPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>

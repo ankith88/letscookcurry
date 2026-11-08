@@ -14,6 +14,7 @@ export type Recipe = {
   region: "South" | "North" | "West" | "East";
   diet: "Non-Veg" | "Veg";
   isWeekly?: boolean;
+  isFeatured?: boolean;
   spice: "mild" | "medium" | "hot" | "very-hot";
 };
 
@@ -41,6 +42,7 @@ export type SiteSettings = {
   orderingFeatureEnabled: boolean;
   orderWindowMode: OrderWindowMode;
   adminEmails: string[];
+  featuredRecipeId?: string;
   updatedAt?: string;
   updatedBy?: string;
 };

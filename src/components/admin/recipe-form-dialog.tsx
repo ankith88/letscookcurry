@@ -72,6 +72,7 @@ export function RecipeFormDialog({
   const [diet, setDiet] = useState<Recipe['diet']>('Veg');
   const [spice, setSpice] = useState<Recipe['spice']>('medium');
   const [isWeekly, setIsWeekly] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
   const [ingredients, setIngredients] = useState<string[]>(['']);
   const [instructions, setInstructions] = useState<string[]>(['']);
 
@@ -87,6 +88,7 @@ export function RecipeFormDialog({
       setDiet(editingRecipe.diet || 'Veg');
       setSpice(editingRecipe.spice || 'medium');
       setIsWeekly(Boolean(editingRecipe.isWeekly));
+      setIsFeatured(Boolean(editingRecipe.isFeatured));
       setIngredients(
         editingRecipe.ingredients?.length ? [...editingRecipe.ingredients] : ['']
       );
@@ -105,6 +107,7 @@ export function RecipeFormDialog({
       setDiet('Veg');
       setSpice('medium');
       setIsWeekly(false);
+      setIsFeatured(false);
       setIngredients(['']);
       setInstructions(['']);
       setAiPrompt('');
@@ -272,6 +275,7 @@ export function RecipeFormDialog({
         diet,
         spice,
         isWeekly,
+        isFeatured,
       };
 
       if (editingRecipe) {
@@ -445,6 +449,23 @@ export function RecipeFormDialog({
                   onCheckedChange={setIsWeekly}
                 />
               </div>
+            </div>
+
+            {/* Hero Featured Recipe Spotlight Toggle */}
+            <div className="flex items-center justify-between rounded-xl border border-primary/40 bg-primary/5 px-4 py-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="recipe-featured" className="text-sm font-bold text-foreground cursor-pointer">
+                  Set as Homepage Featured Recipe
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Highlight this dish in the Featured Recipe spotlight card in the homepage hero section.
+                </p>
+              </div>
+              <Switch
+                id="recipe-featured"
+                checked={isFeatured}
+                onCheckedChange={setIsFeatured}
+              />
             </div>
 
             {/* Short & Long Descriptions */}

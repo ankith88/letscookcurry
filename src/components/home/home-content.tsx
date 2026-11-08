@@ -2,10 +2,22 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { CalendarClock, ChefHat, Truck } from 'lucide-react';
+import {
+  ArrowRight,
+  CalendarClock,
+  ChefHat,
+  Drumstick,
+  Leaf,
+  MapPin,
+  Sparkles,
+  Star,
+  Truck,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { RecipeGrid } from '@/components/recipes/recipe-grid';
 import { FilteredRecipeGrid } from '@/components/recipes/filtered-recipe-grid';
+import { SpiceLevel } from '@/components/recipes/spice-level';
 import { useSiteSettings } from '@/context/site-settings-context';
 import type { Recipe, SiteSettings } from '@/lib/types';
 
@@ -35,7 +47,14 @@ export function HomeContent({
   const orderWindowMode = effectiveSettings.orderWindowMode;
 
   const hasWeeklyRecipes = orderingActive && weeklyRecipes.length > 0;
-  const leadDish = (orderingActive && weeklyRecipes[0]) || allRecipes[0];
+  const configuredFeaturedId = effectiveSettings.featuredRecipeId?.trim();
+  const leadDish =
+    (configuredFeaturedId &&
+      (allRecipes.find((r) => r.id === configuredFeaturedId) ||
+        weeklyRecipes.find((r) => r.id === configuredFeaturedId))) ||
+    allRecipes.find((r) => r.isFeatured) ||
+    (orderingActive && weeklyRecipes[0]) ||
+    allRecipes[0];
 
   const getHeroOrderBannerText = () => {
     if (!orderingActive) {
@@ -143,21 +162,96 @@ export function HomeContent({
               </div>
 
               {leadDish && (
-                <div className="rounded-2xl border border-border bg-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">
-                      {orderingActive ? 'On the stove this week' : 'Featured Recipe'}
-                    </p>
-                    <p className="font-headline text-xl font-bold text-foreground">
-                      {leadDish.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground line-clamp-1">
-                      {leadDish.description}
-                    </p>
+                <div className="group relative rounded-2xl border border-primary/35 bg-card p-4 sm:p-5 shadow-sm transition-all duration-200 hover:border-primary/60 hover:shadow-md">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+                    {/* Dish Thumbnail */}
+                    <Link
+                      href={`/recipe/${leadDish.id}`}
+                      className="relative h-44 sm:h-28 sm:w-32 shrink-0 overflow-hidden rounded-xl border border-border bg-muted/40 block"
+                    >
+                      <Image
+                        src={leadDish.imageUrl}
+                        alt={leadDish.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 128px"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        data-ai-hint={leadDish.imageHint || leadDish.name.toLowerCase()}
+                      />
+                      <div
+                        className="num absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-background/95 backdrop-blur-sm px-2 py-0.5 text-[11px] font-bold text-foreground shadow-sm border border-border/80"
+                        aria-label={`Rated ${(leadDish.rating || 5).toFixed(1)} out of 5 stars`}
+                      >
+                        <Star className="h-3 w-3 text-primary fill-primary" aria-hidden="true" />
+                        <span>{(leadDish.rating || 5).toFixed(1)}</span>
+                      </div>
+                    </Link>
+
+                    {/* Dish Details & Metadata */}
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-bold text-foreground">
+                          <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                          <span>
+                            {orderingActive && leadDish.isWeekly
+                              ? 'On the Stove This Week'
+                              : 'Featured Recipe'}
+                          </span>
+                        </div>
+                        {orderingActive && leadDish.price > 0 && (
+                          <span className="num text-sm font-bold text-foreground">
+                            ${Number(leadDish.price).toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+
+                      <div>
+                        <Link
+                          href={`/recipe/${leadDish.id}`}
+                          className="font-headline text-xl sm:text-2xl font-bold text-foreground hover:text-primary transition-colors block truncate"
+                        >
+                          {leadDish.name}
+                        </Link>
+                        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mt-0.5">
+                          {leadDish.description?.replace(/\.{4,}$/, '...')}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <Badge
+                            variant="outline"
+                            className="gap-1 text-xs font-medium bg-secondary/50 text-foreground border-border"
+                          >
+                            {leadDish.diet === 'Veg' ? (
+                              <Leaf className="h-3 w-3 text-primary" aria-hidden="true" />
+                            ) : (
+                              <Drumstick className="h-3 w-3 text-primary" aria-hidden="true" />
+                            )}
+                            {leadDish.diet === 'Veg' ? 'Vegetarian' : 'Meat & Poultry'}
+                          </Badge>
+                          <Badge variant="outline" className="gap-1 text-xs">
+                            <MapPin className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
+                            {leadDish.region}
+                          </Badge>
+                          {leadDish.spice && <SpiceLevel spice={leadDish.spice} />}
+                        </div>
+
+                        <Button
+                          asChild
+                          size="sm"
+                          className="w-full sm:w-auto rounded-xl px-4 font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm shrink-0"
+                        >
+                          <Link href={`/recipe/${leadDish.id}`}>
+                            <span>View Recipe</span>
+                            <ArrowRight
+                              className="ml-1.5 h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                              aria-hidden="true"
+                            />
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                  <Button asChild variant="secondary" className="rounded-xl shrink-0 font-semibold">
-                    <Link href={`/recipe/${leadDish.id}`}>Inspect Recipe</Link>
-                  </Button>
                 </div>
               )}
             </div>
