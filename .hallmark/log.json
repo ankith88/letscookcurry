@@ -1,0 +1,27 @@
+[
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "page",
+  "shape": "Split Studio",
+  "theme": "brand",
+  "axes": "light/roman-serif/warm",
+  "hero": "Split",
+  "nav": "kept",
+  "footer": "kept",
+  "imagery": "user-photo",
+  "photos": [],
+  "entry": "src/app/page.tsx",
+  "fingerprint": "Hanging|Two-column asymmetric|Hairline|Solid|Tightly cropped to the grid|Type-unmask",
+  "sections": [
+   "Hero",
+   "Schedule",
+   "Weekly Curries",
+   "Full Menu"
+  ],
+  "signature": "deep curry-leaf diptych stage with sticky left studio rail and 6-day kitchen board",
+  "waived": [],
+  "prompt": "Weekly homemade Indian curry delivery and recipe collection in Sydney",
+  "date": "2026-11-08"
+ }
+]

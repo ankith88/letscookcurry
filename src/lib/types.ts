@@ -33,4 +33,14 @@ export type Rating = {
   comment: string;
   // This will be a string in ISO format on the client
   createdAt: string; 
-}
+};
+
+export type OrderWindowMode = 'auto' | 'open' | 'closed';
+
+export type SiteSettings = {
+  orderingFeatureEnabled: boolean;
+  orderWindowMode: OrderWindowMode;
+  adminEmails: string[];
+  updatedAt?: string;
+  updatedBy?: string;
+};

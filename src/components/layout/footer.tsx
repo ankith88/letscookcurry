@@ -1,8 +1,19 @@
+"use client";
+
 import Link from 'next/link';
 import Image from 'next/image';
-import { CalendarClock, MapPin, UtensilsCrossed } from 'lucide-react';
+import { CalendarClock, Flame, MapPin, UtensilsCrossed } from 'lucide-react';
+import { useSiteSettings } from '@/context/site-settings-context';
 
 export function Footer() {
+  const { orderingFeatureEnabled, orderWindowMode } = useSiteSettings();
+
+  const getScheduleStatusLabel = () => {
+    if (orderWindowMode === 'open') return 'Orders Open Now';
+    if (orderWindowMode === 'closed') return 'Ordering Currently Paused';
+    return 'Orders Open: Monday to Thursday';
+  };
+
   return (
     <footer className="border-t border-border/60 bg-secondary/40 text-foreground">
       <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
@@ -21,7 +32,9 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
-              Authentic home-style Indian curries and recipe kits crafted with love in Sydney. Fresh weekly menus delivered straight from our kitchen to yours.
+              {orderingFeatureEnabled
+                ? 'Authentic home-style Indian curries and recipe kits crafted with love in Sydney. Fresh weekly menus delivered straight from our kitchen to yours.'
+                : 'Authentic home-style Indian curries crafted with love in Sydney. Sharing cherished regional recipes from our family kitchen to yours.'}
             </p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <MapPin className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
@@ -34,7 +47,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/" className="hover:text-primary transition-colors">
-                  Home &amp; Weekly Menu
+                  {orderingFeatureEnabled ? 'Home & Weekly Menu' : 'Home'}
                 </Link>
               </li>
               <li>
@@ -49,35 +62,61 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/profile" className="hover:text-primary transition-colors">
-                  My Profile &amp; Order History
+                  {orderingFeatureEnabled ? 'My Profile & Order History' : 'My Profile'}
                 </Link>
               </li>
             </ul>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="font-headline text-base font-bold">Weekly Ordering Schedule</h3>
-            <div className="rounded-xl border border-border/80 bg-card p-4 space-y-2.5 text-sm shadow-sm">
-              <div className="flex items-start gap-2.5">
-                <CalendarClock className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
-                <div>
-                  <p className="font-semibold text-foreground">Orders Open: Mon – Thu</p>
-                  <p className="text-xs text-muted-foreground">
-                    New curated weekly curries are posted every Monday morning.
-                  </p>
+          {orderingFeatureEnabled ? (
+            <div className="space-y-3">
+              <h3 className="font-headline text-base font-bold">Weekly Ordering Schedule</h3>
+              <div className="rounded-xl border border-border/80 bg-card p-4 space-y-2.5 text-sm shadow-sm">
+                <div className="flex items-start gap-2.5">
+                  <CalendarClock className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-foreground">{getScheduleStatusLabel()}</p>
+                    <p className="text-xs text-muted-foreground">
+                      New curated weekly curries are posted every Monday morning.
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <UtensilsCrossed className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
-                <div>
-                  <p className="font-semibold text-foreground">Fresh Delivery: Following Monday</p>
-                  <p className="text-xs text-muted-foreground">
-                    Slow-cooked, freshly spiced, and delivered ready to enjoy.
-                  </p>
+                <div className="flex items-start gap-2.5">
+                  <UtensilsCrossed className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-foreground">Fresh Delivery: Following Monday</p>
+                    <p className="text-xs text-muted-foreground">
+                      Slow-cooked, freshly spiced, and delivered ready to enjoy.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-3">
+              <h3 className="font-headline text-base font-bold">Our Culinary Heritage</h3>
+              <div className="rounded-xl border border-border/80 bg-card p-4 space-y-2.5 text-sm shadow-sm">
+                <div className="flex items-start gap-2.5">
+                  <Flame className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-foreground">Four Regions of India</p>
+                    <p className="text-xs text-muted-foreground">
+                      Explore traditional North, South, East, and West Indian recipes with step-by-step instructions.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <UtensilsCrossed className="h-4 w-4 text-primary mt-0.5 shrink-0" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-foreground">Made for Home Kitchens</p>
+                    <p className="text-xs text-muted-foreground">
+                      Interactive ingredient checklists and community tasting notes on every recipe.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="mt-10 border-t border-border/60 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
@@ -88,4 +127,3 @@ export function Footer() {
     </footer>
   );
 }
-

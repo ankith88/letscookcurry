@@ -1,11 +1,11 @@
 "use client";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingCart, User, Menu } from 'lucide-react';
+import { ShoppingCart, User, Menu, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/use-cart';
 import { CartSheet } from '@/components/cart/cart-sheet';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import {
   Sheet,
@@ -15,12 +15,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from '@/lib/utils';
-import { getAuth, onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
-import { app } from '@/lib/firebase';
+import { useSiteSettings } from '@/context/site-settings-context';
 
-const auth = getAuth(app);
-
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About Us' },
   { href: '/profile', label: 'Profile' },
@@ -28,16 +25,22 @@ const NAV_ITEMS = [
 
 function NavLinks({
   pathname,
+  showAdmin,
   onNavigate,
   mobile = false,
 }: {
   pathname: string;
+  showAdmin: boolean;
   onNavigate?: () => void;
   mobile?: boolean;
 }) {
+  const navItems = showAdmin
+    ? [...BASE_NAV_ITEMS, { href: '/admin', label: 'Admin Studio' }]
+    : BASE_NAV_ITEMS;
+
   return (
     <>
-      {NAV_ITEMS.map((item) => {
+      {navItems.map((item) => {
         const isActive =
           item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
         return (
@@ -47,13 +50,14 @@ function NavLinks({
             onClick={onNavigate}
             aria-current={isActive ? 'page' : undefined}
             className={cn(
-              'transition-colors px-3.5 py-2 rounded-full font-medium',
+              'transition-colors px-3.5 py-2 rounded-full font-medium inline-flex items-center gap-1.5',
               mobile ? 'text-base w-full' : 'text-sm',
               isActive
                 ? 'bg-primary text-primary-foreground shadow-sm'
                 : 'text-foreground/85 hover:text-white hover:bg-nav-hover'
             )}
           >
+            {item.href === '/admin' && <ShieldCheck className="h-4 w-4" aria-hidden="true" />}
             {item.label}
           </Link>
         );
@@ -67,22 +71,21 @@ export function Header() {
   const pathname = usePathname();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const {
+    orderingFeatureEnabled,
+    currentUser,
+    isAdmin,
+    canBootstrapAdmin,
+  } = useSiteSettings();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-    });
-    return () => unsubscribe();
-  }, []);
-
+  const showAdminLink = isAdmin || canBootstrapAdmin;
   const profileHref = currentUser ? '/profile' : '/login';
   const profileLabel = currentUser
     ? `Profile (${currentUser.displayName || currentUser.email || 'Signed in'})`
     : 'Sign in to your account';
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         {/* Mobile Menu */}
         <div className="flex items-center sm:hidden">
@@ -116,6 +119,7 @@ export function Header() {
               >
                 <NavLinks
                   pathname={pathname}
+                  showAdmin={showAdminLink}
                   onNavigate={() => setIsMobileMenuOpen(false)}
                   mobile
                 />
@@ -132,10 +136,10 @@ export function Header() {
               alt="Let's Cook Curry Logo"
               width={40}
               height={40}
-              className="rounded-full transition-transform duration-200 group-hover:scale-105"
+              className="rounded-full"
               data-ai-hint="logo curry"
             />
-            <span className="font-bold font-headline text-lg tracking-tight inline-block">
+            <span className="font-bold font-headline text-lg tracking-tight inline-block transition-colors duration-200 group-hover:text-primary">
               Let&apos;s Cook Curry
             </span>
           </Link>
@@ -146,7 +150,7 @@ export function Header() {
           aria-label="Primary Navigation"
           className="items-center space-x-1 hidden sm:flex"
         >
-          <NavLinks pathname={pathname} />
+          <NavLinks pathname={pathname} showAdmin={showAdminLink} />
         </nav>
 
         {/* Centered Mobile Logo */}
@@ -184,32 +188,36 @@ export function Header() {
               )}
             </Link>
           </Button>
-          <div className="relative">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-nav-hover hover:text-white rounded-full"
-              aria-label={
-                totalItems > 0
-                  ? `Shopping Cart, ${totalItems} ${totalItems === 1 ? 'item' : 'items'}`
-                  : 'Shopping Cart, empty'
-              }
-              onClick={() => setIsCartOpen(true)}
-            >
-              <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-            </Button>
-            {totalItems > 0 && (
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute -top-1 -right-1 flex h-5 min-w-[1.25rem] px-1 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground shadow-sm"
+          {orderingFeatureEnabled && (
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-nav-hover hover:text-white rounded-full"
+                aria-label={
+                  totalItems > 0
+                    ? `Shopping Cart, ${totalItems} ${totalItems === 1 ? 'item' : 'items'}`
+                    : 'Shopping Cart, empty'
+                }
+                onClick={() => setIsCartOpen(true)}
               >
-                {totalItems}
-              </span>
-            )}
-          </div>
+                <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+              </Button>
+              {totalItems > 0 && (
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -top-1 -right-1 flex h-5 min-w-[1.25rem] px-1 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground shadow-sm"
+                >
+                  {totalItems}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
-      <CartSheet open={isCartOpen} onOpenChange={setIsCartOpen} />
+      {orderingFeatureEnabled && (
+        <CartSheet open={isCartOpen} onOpenChange={setIsCartOpen} />
+      )}
     </header>
   );
 }

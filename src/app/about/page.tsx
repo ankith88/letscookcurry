@@ -69,7 +69,7 @@ export default function AboutPage() {
               Happy cooking! — Tanvi &amp; Ankith
             </p>
             <Button asChild size="lg" className="font-semibold">
-              <Link href="/#recipes">Explore Our Weekly Menu</Link>
+              <Link href="/#all-recipes">Explore Our Recipes</Link>
             </Button>
           </div>
         </div>

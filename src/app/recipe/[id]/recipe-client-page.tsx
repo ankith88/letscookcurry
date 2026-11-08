@@ -27,6 +27,7 @@ import type { Recipe, Rating } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { event } from '@/lib/gtag';
 import { SpiceLevel } from '@/components/recipes/spice-level';
+import { useSiteSettings } from '@/context/site-settings-context';
 
 interface RecipeClientPageProps {
   initialRecipe: Recipe;
@@ -37,14 +38,20 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
   const [recipe, setRecipe] = useState(initialRecipe);
   const [ratings, setRatings] = useState(initialRatings);
   const [checkedIngredients, setCheckedIngredients] = useState<Record<number, boolean>>({});
-  const [orderableState, setOrderableState] = useState<'loading' | 'orderable' | 'closed'>('loading');
+  const {
+    orderingFeatureEnabled,
+    orderWindowMode,
+    isOrdersOpen,
+    loading: settingsLoading,
+  } = useSiteSettings();
+
+  const orderableState: 'loading' | 'orderable' | 'closed' = settingsLoading
+    ? 'loading'
+    : isOrdersOpen
+    ? 'orderable'
+    : 'closed';
 
   useEffect(() => {
-    // Day check is done on client to avoid hydration mismatch
-    const today = new Date().getDay();
-    // Monday to Thursday (1-4)
-    setOrderableState(today >= 1 && today <= 4 ? 'orderable' : 'closed');
-
     if (recipe) {
       event({
         action: 'view_recipe',
@@ -76,7 +83,7 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
   };
 
   const renderOrderSection = () => {
-    if (!recipe?.isWeekly) return null;
+    if (!orderingFeatureEnabled || !recipe?.isWeekly) return null;
 
     return (
       <div className="rounded-xl border border-border/80 bg-secondary/40 p-5 space-y-4">
@@ -99,7 +106,9 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
         {orderableState === 'closed' && (
           <Button size="lg" variant="secondary" className="w-full" disabled>
             <Ban className="mr-2 h-5 w-5" aria-hidden="true" />
-            Ordering Closed (Open Mon–Thu)
+            {orderWindowMode === 'closed'
+              ? 'Ordering Currently Closed'
+              : 'Ordering Closed (Open Mon–Thu)'}
           </Button>
         )}
       </div>
@@ -281,7 +290,9 @@ export default function RecipeClientPage({ initialRecipe, initialRatings }: Reci
           <CardHeader>
             <CardTitle className="text-2xl font-headline">Rate this Recipe</CardTitle>
             <CardDescription>
-              Tried cooking or ordering {recipe.name}? Let the community know what you thought!
+              {orderingFeatureEnabled
+                ? `Tried cooking or ordering ${recipe.name}? Let the community know what you thought!`
+                : `Tried cooking ${recipe.name}? Let the community know what you thought!`}
             </CardDescription>
           </CardHeader>
           <CardContent>

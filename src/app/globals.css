@@ -1,3 +1,14 @@
+/* Hallmark · shape: Split Studio · genre: editorial · theme: brand · redesign: full
+ * paper: oklch(96.8% 0.018 82) · accent: oklch(76% 0.155 68) · display: Playfair Display · body: Lato · hero: Split · nav: kept · footer: kept · signature: deep curry-leaf diptych stage with sticky left studio rail and 6-day kitchen board
+ * axes: light/roman-serif/warm · posture: restrained · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 · weakest: R, added scrub-linked statement head wipe and diptych entrance choreography */
+/* Hallmark · reworded "Order Monday – Thursday • Fresh Delivery Every Monday" to "Orders open Monday to Thursday, delivered fresh Monday." · 19 and 63 name dashes and middle-dots */
+/* Hallmark · reworded "Orders Open: Mon – Thu" to "Orders Open: Monday to Thursday" · 19 names the dash */
+/* Hallmark · dropped "Limited Weekly Selection" · 54 and 67 name the eyebrow */
+/* Hallmark · dropped "Recipe Archive & Inspiration" · 54 and 67 name the eyebrow */
+@import "./tokens.css";
+@import "./base.css" layer(base);
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,7 +24,7 @@ html {
 }
 
 body {
-  font-family: var(--font-body), 'Lato', sans-serif;
+  font-family: var(--font-body);
 }
 
 @layer base {
@@ -71,5 +82,80 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Interactive states (Floor & Gate 26b) */
+button,
+a[role="button"],
+[type="button"],
+[type="submit"],
+.interactive-control {
+  transition:
+    transform var(--dur-micro) var(--ease-out),
+    background-color var(--dur-short) var(--ease-out),
+    border-color var(--dur-short) var(--ease-out),
+    color var(--dur-short) var(--ease-out),
+    box-shadow var(--dur-short) var(--ease-out);
+}
+
+button:active:not(:disabled),
+a[role="button"]:active,
+[type="button"]:active:not(:disabled),
+[type="submit"]:active:not(:disabled),
+.interactive-control:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled,
+[type="button"]:disabled,
+[type="submit"]:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled,
+[aria-disabled="true"] {
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+/* Split Studio Diptych Hero Entrance (two halves fade in 80ms apart) */
+@keyframes diptych-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .diptych-left {
+    animation: diptych-enter var(--dur-long) var(--ease-out) 20ms both;
+  }
+  .diptych-right {
+    animation: diptych-enter var(--dur-long) var(--ease-out) 100ms both;
+  }
+}
+
+/* Scroll Choreography: Scrub-linked Statement Headline Wipe */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 40rem) {
+    .statement-wipe {
+      animation: head-wipe linear both;
+      animation-timeline: view();
+      animation-range: entry 15% cover 42%;
+    }
+    @keyframes head-wipe {
+      from {
+        clip-path: inset(0 100% 0 0);
+        transform: translateX(-0.2em);
+      }
+      to {
+        clip-path: inset(0 0 0 0);
+        transform: none;
+      }
+    }
   }
 }

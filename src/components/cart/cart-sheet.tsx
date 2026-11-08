@@ -18,23 +18,27 @@ import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { Order } from '@/lib/types';
+import { useSiteSettings } from '@/context/site-settings-context';
 
 const ORDERS_STORAGE_KEY = 'lets_cook_curry_orders';
 
 export function CartSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const { items, updateQuantity, removeItem, clearCart, totalItems, totalPrice } = useCart();
   const { toast } = useToast();
+  const {
+    orderingFeatureEnabled,
+    orderWindowMode,
+    isOrdersOpen,
+    loading: settingsLoading,
+  } = useSiteSettings();
   const [isClient, setIsClient] = useState(false);
-  const [isOrderable, setIsOrderable] = useState(false);
   const [orderPlacedId, setOrderPlacedId] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
-    // Day check is done on client to avoid hydration mismatch
-    // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu
-    const today = new Date().getDay();
-    setIsOrderable(today >= 1 && today <= 4);
   }, []);
+
+  const isOrderable = orderingFeatureEnabled && isOrdersOpen && !settingsLoading;
 
   useEffect(() => {
     if (!open) {
@@ -171,7 +175,7 @@ export function CartSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
                   <span>Total ({totalItems} {totalItems === 1 ? 'item' : 'items'})</span>
                   <span className="text-xl text-primary">${totalPrice.toFixed(2)}</span>
                 </div>
-                {isClient && !isOrderable && (
+                {isClient && !settingsLoading && !isOrderable && (
                   <Alert
                     variant="default"
                     className="bg-amber-50 border-amber-200 dark:bg-amber-950 dark:border-amber-800"
@@ -181,7 +185,9 @@ export function CartSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
                       Ordering is currently closed
                     </AlertTitle>
                     <AlertDescription className="text-amber-800 dark:text-amber-300">
-                      Orders can be placed Monday through Thursday for fresh delivery on the following Monday.
+                      {orderWindowMode === 'closed'
+                        ? 'Orders are temporarily paused by the kitchen. Please check back soon!'
+                        : 'Orders can be placed Monday through Thursday for fresh delivery on the following Monday.'}
                     </AlertDescription>
                   </Alert>
                 )}

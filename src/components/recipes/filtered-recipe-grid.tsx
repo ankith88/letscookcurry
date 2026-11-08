@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -14,11 +13,25 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Search, Map, Leaf, Flame, RotateCcw, UtensilsCrossed } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface FilteredRecipeGridProps {
   recipes: Recipe[];
 }
+
+const REGION_OPTIONS = [
+  { value: 'all', label: 'All Regions' },
+  { value: 'North', label: 'North India' },
+  { value: 'South', label: 'South India' },
+  { value: 'East', label: 'East India' },
+  { value: 'West', label: 'West India' },
+];
+
+const DIET_OPTIONS = [
+  { value: 'all', label: 'All Diets' },
+  { value: 'Veg', label: 'Vegetarian' },
+  { value: 'Non-Veg', label: 'Meat & Poultry' },
+];
 
 export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,11 +63,57 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
 
   return (
     <div>
-      <Card className="mb-8 border-border/70 bg-card/90 p-5 sm:p-6 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="mb-10 rounded-2xl border border-border/80 bg-secondary/35 p-5 sm:p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-border/60">
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Quick region filter">
+            {REGION_OPTIONS.map((opt) => {
+              const active = region === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setRegion(opt.value)}
+                  aria-pressed={active}
+                  className={cn(
+                    'px-3.5 py-1.5 rounded-full text-sm font-semibold transition-colors',
+                    active
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'bg-background/80 text-foreground/80 hover:bg-background hover:text-foreground border border-border/70'
+                  )}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Quick dietary filter">
+            {DIET_OPTIONS.map((opt) => {
+              const active = diet === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setDiet(opt.value)}
+                  aria-pressed={active}
+                  className={cn(
+                    'px-3.5 py-1.5 rounded-full text-sm font-semibold transition-colors',
+                    active
+                      ? 'bg-leaf text-leaf-ink shadow-sm'
+                      : 'bg-background/80 text-foreground/80 hover:bg-background hover:text-foreground border border-border/70'
+                  )}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="relative">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
               aria-hidden="true"
             />
             <Input
@@ -63,12 +122,12 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
               placeholder="Search curries by name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-background rounded-xl"
             />
           </div>
           <div>
             <Select value={region} onValueChange={setRegion}>
-              <SelectTrigger aria-label="Filter by region">
+              <SelectTrigger aria-label="Filter by region" className="bg-background rounded-xl">
                 <div className="flex items-center gap-2">
                   <Map className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                   <SelectValue placeholder="Filter by region" />
@@ -85,7 +144,7 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
           </div>
           <div>
             <Select value={diet} onValueChange={setDiet}>
-              <SelectTrigger aria-label="Filter by dietary preference">
+              <SelectTrigger aria-label="Filter by dietary preference" className="bg-background rounded-xl">
                 <div className="flex items-center gap-2">
                   <Leaf className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                   <SelectValue placeholder="Filter by diet" />
@@ -100,7 +159,7 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
           </div>
           <div>
             <Select value={spice} onValueChange={setSpice}>
-              <SelectTrigger aria-label="Filter by spice level">
+              <SelectTrigger aria-label="Filter by spice level" className="bg-background rounded-xl">
                 <div className="flex items-center gap-2">
                   <Flame className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                   <SelectValue placeholder="Filter by spice level" />
@@ -118,7 +177,7 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-border/50 text-sm text-muted-foreground">
-          <p aria-live="polite">
+          <p aria-live="polite" className="num">
             Showing <span className="font-semibold text-foreground">{filteredRecipes.length}</span> of{' '}
             <span className="font-semibold text-foreground">{recipes.length}</span> recipes
           </p>
@@ -135,7 +194,7 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
             </Button>
           )}
         </div>
-      </Card>
+      </div>
 
       {filteredRecipes.length > 0 ? (
         <RecipeGrid recipes={filteredRecipes} cardType="view" />
@@ -155,7 +214,7 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
               type="button"
               variant="outline"
               onClick={resetFilters}
-              className="mt-5"
+              className="mt-5 rounded-xl"
             >
               <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
               Clear All Filters

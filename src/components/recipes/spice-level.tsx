@@ -11,10 +11,10 @@ interface SpiceLevelProps {
 }
 
 const spiceConfig = {
-  mild: { level: 1, label: 'Mild', color: 'text-yellow-500 fill-yellow-500' },
-  medium: { level: 2, label: 'Medium', color: 'text-orange-500 fill-orange-500' },
-  hot: { level: 3, label: 'Hot', color: 'text-red-500 fill-red-500' },
-  'very-hot': { level: 4, label: 'Very Hot', color: 'text-red-700 fill-red-700' },
+  mild: { level: 1, label: 'Mild', color: 'text-primary fill-primary/60' },
+  medium: { level: 2, label: 'Medium', color: 'text-primary fill-primary' },
+  hot: { level: 3, label: 'Hot', color: 'text-destructive fill-destructive/80' },
+  'very-hot': { level: 4, label: 'Very Hot', color: 'text-destructive fill-destructive' },
 };
 
 export function SpiceLevel({ spice }: SpiceLevelProps) {

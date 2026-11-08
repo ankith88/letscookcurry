@@ -1,0 +1,13 @@
+{
+  "scanned": "2026-11-08",
+  "findings": {
+    "fonts": "Playfair Display (--font-headline) + Lato (--font-body) via next/font/google (src/app/layout.tsx:13-25)",
+    "palette": "HSL CSS custom properties on :root and .dark — warm cream background (39 77% 96%), saffron/amber primary (35 92% 59%), olive-brown dark mode (src/app/globals.css:20-65)",
+    "motion": "tailwindcss-animate 1.0.7 (package.json:55, tailwind.config.ts:99)",
+    "spacing": "Tailwind default 4pt spacing scale (tailwind.config.ts)",
+    "framework": "Next.js 15.3.8 App Router + React 18 + shadcn/ui (package.json)"
+  },
+  "preserve": ["font stack", "palette", "brand logo", "wiring", "content"],
+  "introduce": ["shape", "theme", "gates", "hero discipline", "tokens.css", "base.css"]
+}
+

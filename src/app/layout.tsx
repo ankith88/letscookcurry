@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { CartProvider } from '@/context/cart-context';
+import { SiteSettingsProvider } from '@/context/site-settings-context';
 import { Toaster } from '@/components/ui/toaster';
 import Script from 'next/script';
 import { GTM_ID } from '@/lib/firebase';
@@ -13,7 +14,7 @@ import { GTM_ID } from '@/lib/firebase';
 const lato = Lato({
   subsets: ['latin'],
   weight: ['400', '700'],
-  variable: '--font-body',
+  variable: '--font-lato',
   display: 'swap',
 });
 
@@ -67,14 +68,16 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased'
         )}
       >
-        <CartProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-          <Toaster />
-        </CartProvider>
+        <SiteSettingsProvider>
+          <CartProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+            <Toaster />
+          </CartProvider>
+        </SiteSettingsProvider>
       </body>
     </html>
   );

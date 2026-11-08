@@ -11,10 +11,25 @@ export default {
     extend: {
       fontFamily: {
         body: ['var(--font-body)', 'Lato', 'sans-serif'],
-        headline: ['var(--font-headline)', 'Playfair Display', 'serif'],
+        headline: ['var(--font-display)', 'Playfair Display', 'serif'],
+        display: ['var(--font-display)', 'Playfair Display', 'serif'],
         code: ['monospace'],
       },
       colors: {
+        paper: {
+          DEFAULT: 'var(--color-paper)',
+          '2': 'var(--color-paper-2)',
+          '3': 'var(--color-paper-3)',
+        },
+        ink: {
+          DEFAULT: 'var(--color-ink)',
+          '2': 'var(--color-ink-2)',
+        },
+        rule: 'var(--color-rule)',
+        leaf: {
+          DEFAULT: 'var(--color-leaf)',
+          ink: 'var(--color-leaf-ink)',
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
