@@ -8,7 +8,7 @@ export const SITE_SETTINGS_DOC_ID = 'site';
 export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   orderingFeatureEnabled: true,
   orderWindowMode: 'auto',
-  adminEmails: [],
+  adminEmails: ['ankith88@gmail.com', 'tanvihegde19@gmail.com'],
 };
 
 export function normalizeSiteSettings(raw?: Partial<SiteSettings> | null): SiteSettings {

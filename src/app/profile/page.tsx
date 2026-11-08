@@ -3,6 +3,7 @@
 
 import { useCart } from "@/hooks/use-cart";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
@@ -175,9 +176,17 @@ export default function ProfilePage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <CardTitle className="text-2xl font-headline">
-                    {user.displayName || "Valued Curry Lover"}
-                  </CardTitle>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle className="text-2xl font-headline">
+                      {user.displayName || "Valued Curry Lover"}
+                    </CardTitle>
+                    {isAdmin && (
+                      <Badge className="gap-1 text-xs font-semibold">
+                        <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                        Admin
+                      </Badge>
+                    )}
+                  </div>
                   <CardDescription>{user.email}</CardDescription>
                 </div>
               </div>
