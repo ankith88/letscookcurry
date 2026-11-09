@@ -97,7 +97,7 @@ export function Header() {
     if (orderWindowMode === 'open') return 'Orders Open Now · Monday Delivery';
     if (orderWindowMode === 'closed') return 'Ordering Currently Closed';
     return isOrdersOpen
-      ? 'Orders Open (Mon–Thu) · Monday Delivery'
+      ? 'Orders Open (Mon to Thu) · Monday Delivery'
       : 'Ordering Closed (Opens Monday)';
   };
 

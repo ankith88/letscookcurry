@@ -80,7 +80,7 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
                   onClick={() => setRegion(opt.value)}
                   aria-pressed={active}
                   className={cn(
-                    'min-h-[44px] px-4 py-2 rounded-xl text-sm font-semibold transition-colors',
+                    'min-h-[44px] px-4 py-2 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                     active
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-card text-foreground/85 hover:bg-primary/10 hover:text-foreground border border-border'
@@ -106,7 +106,7 @@ export function FilteredRecipeGrid({ recipes }: FilteredRecipeGridProps) {
                   onClick={() => setDiet(opt.value)}
                   aria-pressed={active}
                   className={cn(
-                    'min-h-[44px] px-4 py-2 rounded-xl text-sm font-semibold transition-colors',
+                    'min-h-[44px] px-4 py-2 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                     active
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-card text-foreground/85 hover:bg-primary/10 hover:text-foreground border border-border'

@@ -17,9 +17,12 @@ const spiceConfig = {
 };
 
 export function SpiceLevel({ spice }: SpiceLevelProps) {
-  if (!spice) return null;
+  if (!spice || typeof spice !== 'string') return null;
 
-  const config = spiceConfig[spice];
+  const normalizedSpice = spice.toLowerCase().trim() as keyof typeof spiceConfig;
+  const config = spiceConfig[normalizedSpice];
+  if (!config) return null;
+
   const totalIcons = 4;
 
   return (
